@@ -1,0 +1,143 @@
+{
+  "id": "m_20260925_1500_001",
+  "status": "finished",
+  "stockfishElo": 1500,
+  "engineColor": "white",
+  "engineVersion": "0.1.0",
+  "result": "1-0",
+  "outcome": "win",
+  "termination": "checkmate",
+  "plyCount": 7,
+  "createdAt": "2026-09-25T10:00:00Z",
+  "startedAt": "2026-09-25T10:00:01Z",
+  "finishedAt": "2026-09-25T10:00:26Z",
+  "analysisStatus": "ready",
+  "stockfish": {
+    "version": "Stockfish 17.1",
+    "elo": 1500,
+    "limitStrength": true,
+    "moveTimeMs": 5000,
+    "threads": 1,
+    "hashMb": 64
+  },
+  "engine": {
+    "name": "AmazingChess",
+    "version": "0.1.0",
+    "color": "white",
+    "moveTimeMs": 5000,
+    "options": {
+      "Hash": 64
+    }
+  },
+  "startFen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+  "moves": [
+    {
+      "ply": 1,
+      "color": "white",
+      "by": "engine",
+      "san": "e4",
+      "uci": "e2e4",
+      "fenAfter": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+      "timeMs": 4810,
+      "thinking": {
+        "scoreCp": 30,
+        "mateIn": null,
+        "depth": 18,
+        "seldepth": 26,
+        "nodes": 6200000,
+        "nps": 1290000,
+        "pv": [
+          "e2e4"
+        ]
+      }
+    },
+    {
+      "ply": 2,
+      "color": "black",
+      "by": "stockfish",
+      "san": "e5",
+      "uci": "e7e5",
+      "fenAfter": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+      "timeMs": 3021
+    },
+    {
+      "ply": 3,
+      "color": "white",
+      "by": "engine",
+      "san": "Bc4",
+      "uci": "f1c4",
+      "fenAfter": "rnbqkbnr/pppp1ppp/8/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2",
+      "timeMs": 4790,
+      "thinking": {
+        "scoreCp": 110,
+        "mateIn": null,
+        "depth": 20,
+        "seldepth": 28,
+        "nodes": 6202000,
+        "nps": 1290000,
+        "pv": [
+          "f1c4"
+        ]
+      }
+    },
+    {
+      "ply": 4,
+      "color": "black",
+      "by": "stockfish",
+      "san": "Nc6",
+      "uci": "b8c6",
+      "fenAfter": "r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 2 3",
+      "timeMs": 2877
+    },
+    {
+      "ply": 5,
+      "color": "white",
+      "by": "engine",
+      "san": "Qh5",
+      "uci": "d1h5",
+      "fenAfter": "r1bqkbnr/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 3 3",
+      "timeMs": 4802,
+      "thinking": {
+        "scoreCp": null,
+        "mateIn": 1,
+        "depth": 22,
+        "seldepth": 30,
+        "nodes": 6204000,
+        "nps": 1290000,
+        "pv": [
+          "d1h5"
+        ]
+      }
+    },
+    {
+      "ply": 6,
+      "color": "black",
+      "by": "stockfish",
+      "san": "Nf6",
+      "uci": "g8f6",
+      "fenAfter": "r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4",
+      "timeMs": 3150
+    },
+    {
+      "ply": 7,
+      "color": "white",
+      "by": "engine",
+      "san": "Qxf7#",
+      "uci": "h5f7",
+      "fenAfter": "r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4",
+      "timeMs": 1203,
+      "thinking": {
+        "scoreCp": null,
+        "mateIn": null,
+        "depth": 24,
+        "seldepth": 32,
+        "nodes": 6206000,
+        "nps": 1290000,
+        "pv": [
+          "h5f7"
+        ]
+      }
+    }
+  ],
+  "pgnUrl": "/matches/m_20260925_1500_001/pgn"
+}

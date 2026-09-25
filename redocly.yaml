@@ -1,0 +1,8 @@
+# Lint config for contracts/openapi.yaml — run: npx @redocly/cli lint contracts/openapi.yaml
+extends:
+  - recommended
+rules:
+  info-license: off
+  no-server-example.com: off
+  operation-4xx-response: off   # read-only list endpoints have no client error case
+  no-unused-components: off     # MatchEvent schemas are used by the SSE stream (contracts/events.md)

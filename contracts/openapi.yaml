@@ -1,0 +1,625 @@
+openapi: 3.1.0
+info:
+  title: Amazing Chess API
+  version: 0.1.0
+  summary: Contract between the backend (match runner + game store) and the frontend.
+  description: |
+    Contract-first API. The frontend builds against a mock generated from this file;
+    the backend implements it. Any change here follows the rules in `contracts/README.md`.
+
+    Conventions
+    - All JSON uses camelCase.
+    - Timestamps are ISO-8601 UTC strings.
+    - Chess positions are FEN strings; moves are given in both SAN and UCI.
+    - `outcome` is always from **our engine's** point of view.
+    - Live updates for a running match are Server-Sent Events, documented in `contracts/events.md`.
+servers:
+  - url: http://localhost:8000/api
+    description: Local backend
+  - url: http://127.0.0.1:4010
+    description: Prism mock server (npx @stoplight/prism-cli mock contracts/openapi.yaml)
+security: []  # local app, no authentication (add a scheme here if the app is ever exposed)
+tags:
+  - name: health
+    description: Liveness and versions
+  - name: engines
+    description: Versions of our engine
+  - name: matches
+    description: Play, list, replay and stream matches vs limited Stockfish
+  - name: analysis
+    description: Post-game engine analysis and the two agent reports
+  - name: ladder
+    description: Elo ladder and the proof of the highest Elo beaten
+  - name: stats
+    description: Aggregated results
+
+paths:
+  /health:
+    get:
+      tags: [health]
+      operationId: getHealth
+      summary: Liveness check and versions
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Health" }
+
+  /engines:
+    get:
+      tags: [engines]
+      operationId: listEngines
+      summary: Versions of our engine that can be selected for a match
+      responses:
+        "200":
+          description: Engine versions, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/EngineVersion" }
+
+  /matches:
+    get:
+      tags: [matches]
+      operationId: listMatches
+      summary: List matches (summaries, newest first)
+      parameters:
+        - { name: status, in: query, schema: { $ref: "#/components/schemas/MatchStatus" } }
+        - { name: outcome, in: query, schema: { $ref: "#/components/schemas/Outcome" } }
+        - { name: stockfishElo, in: query, schema: { $ref: "#/components/schemas/StockfishElo" } }
+        - { name: engineVersion, in: query, schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { name: cursor, in: query, description: "Opaque cursor from a previous page", schema: { type: string } }
+      responses:
+        "200":
+          description: A page of match summaries
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MatchPage" }
+    post:
+      tags: [matches]
+      operationId: createMatches
+      summary: Queue one or more matches against limited Stockfish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateMatchRequest" }
+      responses:
+        "202":
+          description: Matches queued
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/MatchSummary" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /matches/{matchId}:
+    parameters:
+      - $ref: "#/components/parameters/MatchId"
+    get:
+      tags: [matches]
+      operationId: getMatch
+      summary: Full match including every move (for replay)
+      responses:
+        "200":
+          description: The match
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Match" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /matches/{matchId}/pgn:
+    parameters:
+      - $ref: "#/components/parameters/MatchId"
+    get:
+      tags: [matches]
+      operationId: getMatchPgn
+      summary: The game as PGN (includes StockfishElo header)
+      responses:
+        "200":
+          description: PGN text
+          content:
+            application/x-chess-pgn:
+              schema: { type: string }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /matches/{matchId}/abort:
+    parameters:
+      - $ref: "#/components/parameters/MatchId"
+    post:
+      tags: [matches]
+      operationId: abortMatch
+      summary: Abort a queued or running match (the game is still saved, as aborted)
+      responses:
+        "200":
+          description: Match after abort
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MatchSummary" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+
+  /matches/{matchId}/events:
+    parameters:
+      - $ref: "#/components/parameters/MatchId"
+    get:
+      tags: [matches]
+      operationId: streamMatchEvents
+      summary: Live Server-Sent Events for a match (see contracts/events.md)
+      description: |
+        `text/event-stream`. Each SSE `event:` name is one of the `MatchEvent.type` values and
+        `data:` is a JSON `MatchEvent`. For a finished match the stream sends `match.snapshot`
+        followed by `match.finished` and closes.
+      responses:
+        "200":
+          description: Event stream
+          content:
+            text/event-stream:
+              schema: { type: string }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /matches/{matchId}/analysis:
+    parameters:
+      - $ref: "#/components/parameters/MatchId"
+    get:
+      tags: [analysis]
+      operationId: getAnalysis
+      summary: Engine analysis + both agent reports for a match
+      responses:
+        "200":
+          description: Analysis (check `status`; fields fill in as work completes)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Analysis" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    post:
+      tags: [analysis]
+      operationId: rerunAnalysis
+      summary: Re-run analysis for a match (previous analysis is kept as history)
+      responses:
+        "202":
+          description: Analysis queued
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Analysis" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+
+  /ladder:
+    get:
+      tags: [ladder]
+      operationId: getLadder
+      summary: Elo ladder — every level attempted and the highest Elo beaten
+      responses:
+        "200":
+          description: Ladder
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ladder" }
+
+  /stats:
+    get:
+      tags: [stats]
+      operationId: getStats
+      summary: Aggregate results per Elo, colour and engine version
+      parameters:
+        - { name: engineVersion, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Stats" }
+
+components:
+  parameters:
+    MatchId:
+      name: matchId
+      in: path
+      required: true
+      schema: { type: string, pattern: "^[A-Za-z0-9_-]{1,64}$" }
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Conflict:
+      description: Not allowed in the current state
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string, examples: [match_not_found, invalid_elo] }
+        message: { type: string }
+        details: { type: object, additionalProperties: true }
+
+    Health:
+      type: object
+      required: [status, apiVersion]
+      properties:
+        status: { type: string, enum: [ok, degraded] }
+        apiVersion: { type: string, description: "Contract version implemented", examples: ["0.1.0"] }
+        stockfishVersion: { type: string, examples: ["Stockfish 17.1"] }
+        latestEngineVersion: { type: string }
+
+    StockfishElo:
+      type: integer
+      minimum: 1320
+      maximum: 3190
+      description: Stockfish UCI_Elo (UCI_LimitStrength is always on)
+
+    Color:
+      type: string
+      enum: [white, black]
+
+    ColorChoice:
+      type: string
+      enum: [white, black, random, alternate]
+      description: "`alternate` flips colour between matches in the same request"
+
+    MatchStatus:
+      type: string
+      enum: [queued, running, finished, aborted, error]
+
+    Outcome:
+      type: string
+      enum: [win, draw, loss]
+      description: From our engine's point of view. Only `win` beats a level.
+
+    Result:
+      type: string
+      enum: ["1-0", "0-1", "1/2-1/2", "*"]
+      description: PGN result
+
+    Termination:
+      type: string
+      enum:
+        - checkmate
+        - stalemate
+        - threefold-repetition
+        - fifty-move-rule
+        - insufficient-material
+        - time-limit-exceeded
+        - illegal-move
+        - engine-crash
+        - aborted
+
+    AnalysisStatus:
+      type: string
+      enum: [pending, running, ready, failed]
+
+    EngineVersion:
+      type: object
+      required: [version, createdAt]
+      properties:
+        version: { type: string, examples: ["0.3.0+nnue1"] }
+        name: { type: string, examples: ["AmazingChess"] }
+        createdAt: { type: string, format: date-time }
+        notes: { type: string, description: "What changed in this version" }
+        estimatedElo: { type: [integer, "null"], description: "Latest measured estimate, if any" }
+
+    CreateMatchRequest:
+      type: object
+      required: [stockfishElo]
+      properties:
+        stockfishElo: { $ref: "#/components/schemas/StockfishElo" }
+        engineColor:
+          allOf: [{ $ref: "#/components/schemas/ColorChoice" }]
+          default: alternate
+        engineVersion: { type: string, description: "Defaults to the latest version" }
+        count: { type: integer, minimum: 1, maximum: 100, default: 1, description: "Number of matches to queue" }
+        startFen: { type: string, description: "Optional non-standard start position (for testing)" }
+
+    StockfishSettings:
+      type: object
+      required: [elo, limitStrength, moveTimeMs]
+      properties:
+        version: { type: string, examples: ["Stockfish 17.1"] }
+        elo: { $ref: "#/components/schemas/StockfishElo" }
+        limitStrength: { type: boolean, const: true }
+        moveTimeMs: { type: integer, maximum: 5000, examples: [5000] }
+        threads: { type: integer, minimum: 1 }
+        hashMb: { type: integer, minimum: 1 }
+
+    EngineSettings:
+      type: object
+      required: [version, color, moveTimeMs]
+      properties:
+        name: { type: string }
+        version: { type: string }
+        color: { $ref: "#/components/schemas/Color" }
+        moveTimeMs: { type: integer, maximum: 5000 }
+        options: { type: object, additionalProperties: true, description: "UCI options used" }
+
+    EngineThinking:
+      type: object
+      description: What our engine reported for the move it played (optional)
+      properties:
+        scoreCp: { type: [integer, "null"], description: "Centipawns, from the mover's point of view" }
+        mateIn: { type: [integer, "null"], description: "Moves to mate (negative = being mated)" }
+        depth: { type: integer }
+        seldepth: { type: integer }
+        nodes: { type: integer }
+        nps: { type: integer }
+        pv: { type: array, items: { type: string }, description: "Principal variation in UCI" }
+
+    Move:
+      type: object
+      required: [ply, color, by, san, uci, fenAfter, timeMs]
+      properties:
+        ply: { type: integer, minimum: 1, description: "1 = White's first move" }
+        color: { $ref: "#/components/schemas/Color" }
+        by: { type: string, enum: [engine, stockfish] }
+        san: { type: string, examples: [Nf3, "exd8=Q+"] }
+        uci: { type: string, examples: [g1f3, e7d8q] }
+        fenAfter: { type: string }
+        timeMs: { type: integer, minimum: 0, maximum: 5000, description: "Thinking time used" }
+        thinking: { $ref: "#/components/schemas/EngineThinking" }
+
+    MatchSummary:
+      type: object
+      required: [id, status, stockfishElo, engineColor, engineVersion, createdAt, analysisStatus]
+      properties:
+        id: { type: string }
+        status: { $ref: "#/components/schemas/MatchStatus" }
+        stockfishElo: { $ref: "#/components/schemas/StockfishElo" }
+        engineColor: { $ref: "#/components/schemas/Color" }
+        engineVersion: { type: string }
+        result: { $ref: "#/components/schemas/Result" }
+        outcome: { anyOf: [{ $ref: "#/components/schemas/Outcome" }, { type: "null" }] }
+        termination: { anyOf: [{ $ref: "#/components/schemas/Termination" }, { type: "null" }] }
+        plyCount: { type: integer, minimum: 0 }
+        createdAt: { type: string, format: date-time }
+        startedAt: { type: [string, "null"], format: date-time }
+        finishedAt: { type: [string, "null"], format: date-time }
+        analysisStatus: { $ref: "#/components/schemas/AnalysisStatus" }
+
+    Match:
+      allOf:
+        - $ref: "#/components/schemas/MatchSummary"
+        - type: object
+          required: [stockfish, engine, startFen, moves]
+          properties:
+            stockfish: { $ref: "#/components/schemas/StockfishSettings" }
+            engine: { $ref: "#/components/schemas/EngineSettings" }
+            startFen: { type: string }
+            moves: { type: array, items: { $ref: "#/components/schemas/Move" } }
+            pgnUrl: { type: string, description: "Relative URL of the PGN, e.g. /matches/{id}/pgn" }
+
+    MatchPage:
+      type: object
+      required: [items]
+      properties:
+        items: { type: array, items: { $ref: "#/components/schemas/MatchSummary" } }
+        nextCursor: { type: [string, "null"] }
+
+    MoveClassification:
+      type: string
+      enum: [book, brilliant, best, excellent, good, inaccuracy, mistake, blunder]
+
+    AnalyzedMove:
+      type: object
+      required: [ply, evalCp, classification]
+      properties:
+        ply: { type: integer, minimum: 1 }
+        evalCp: { type: [integer, "null"], description: "Eval after the move, centipawns, White's point of view" }
+        mateIn: { type: [integer, "null"], description: "Mate distance after the move, White's point of view" }
+        bestMoveUci: { type: string, description: "Best move in the position before this move" }
+        bestMoveSan: { type: string }
+        cpLoss: { type: integer, minimum: 0 }
+        classification: { $ref: "#/components/schemas/MoveClassification" }
+
+    Suggestion:
+      type: object
+      required: [title, detail, priority, category]
+      properties:
+        title: { type: string }
+        detail: { type: string, description: "Markdown" }
+        priority: { type: string, enum: [high, medium, low] }
+        category:
+          type: string
+          enum: [opening, middlegame, endgame, search, evaluation, time-management, tablebases, other]
+        relatedPlies: { type: array, items: { type: integer } }
+
+    AgentReport:
+      type: object
+      required: [agent, status]
+      properties:
+        agent: { type: string, enum: [gm-coach, engine-dev] }
+        status: { $ref: "#/components/schemas/AnalysisStatus" }
+        summary: { type: string, description: "Markdown" }
+        keyMoments:
+          type: array
+          items:
+            type: object
+            required: [ply, comment]
+            properties:
+              ply: { type: integer }
+              comment: { type: string, description: "Markdown" }
+        suggestions: { type: array, items: { $ref: "#/components/schemas/Suggestion" } }
+        createdAt: { type: string, format: date-time }
+
+    Analysis:
+      type: object
+      required: [matchId, status]
+      properties:
+        matchId: { type: string }
+        status: { $ref: "#/components/schemas/AnalysisStatus" }
+        analyzer:
+          type: object
+          properties:
+            engine: { type: string, examples: ["Stockfish 17.1"] }
+            depth: { type: integer }
+        moves: { type: array, items: { $ref: "#/components/schemas/AnalyzedMove" } }
+        summary:
+          type: object
+          properties:
+            engineAccuracy: { type: number, minimum: 0, maximum: 100 }
+            stockfishAccuracy: { type: number, minimum: 0, maximum: 100 }
+            decisivePly: { type: [integer, "null"], description: "Ply where the game was decided" }
+            opening: { type: string, examples: ["C50 Italian Game"] }
+        reports:
+          type: object
+          properties:
+            gmCoach: { $ref: "#/components/schemas/AgentReport" }
+            engineDev: { $ref: "#/components/schemas/AgentReport" }
+        createdAt: { type: string, format: date-time }
+
+    LadderLevel:
+      type: object
+      required: [elo, games, wins, draws, losses, state]
+      properties:
+        elo: { $ref: "#/components/schemas/StockfishElo" }
+        games: { type: integer, minimum: 0 }
+        wins: { type: integer, minimum: 0 }
+        draws: { type: integer, minimum: 0 }
+        losses: { type: integer, minimum: 0 }
+        state: { type: string, enum: [beaten, attempted, untried] }
+        firstWinMatchId: { type: [string, "null"], description: "The proof game for this level" }
+        firstWinAt: { type: [string, "null"], format: date-time }
+
+    Ladder:
+      type: object
+      required: [highestEloBeaten, levels]
+      properties:
+        highestEloBeaten: { type: [integer, "null"] }
+        proofMatchId: { type: [string, "null"], description: "Winning game at highestEloBeaten" }
+        levels: { type: array, items: { $ref: "#/components/schemas/LadderLevel" }, description: "Ascending by elo" }
+
+    WDL:
+      type: object
+      required: [games, wins, draws, losses]
+      properties:
+        games: { type: integer }
+        wins: { type: integer }
+        draws: { type: integer }
+        losses: { type: integer }
+
+    Stats:
+      type: object
+      required: [total, byElo, byColor, byEngineVersion]
+      properties:
+        total: { $ref: "#/components/schemas/WDL" }
+        byElo:
+          type: array
+          items:
+            allOf:
+              - $ref: "#/components/schemas/WDL"
+              - type: object
+                required: [elo]
+                properties: { elo: { type: integer } }
+        byColor:
+          type: object
+          properties:
+            white: { $ref: "#/components/schemas/WDL" }
+            black: { $ref: "#/components/schemas/WDL" }
+        byEngineVersion:
+          type: array
+          items:
+            allOf:
+              - $ref: "#/components/schemas/WDL"
+              - type: object
+                required: [engineVersion]
+                properties: { engineVersion: { type: string } }
+
+    MatchEvent:
+      description: Payload of every SSE message on /matches/{matchId}/events (see contracts/events.md)
+      oneOf:
+        - $ref: "#/components/schemas/MatchSnapshotEvent"
+        - $ref: "#/components/schemas/MatchStartedEvent"
+        - $ref: "#/components/schemas/MovePlayedEvent"
+        - $ref: "#/components/schemas/EngineInfoEvent"
+        - $ref: "#/components/schemas/MatchFinishedEvent"
+        - $ref: "#/components/schemas/AnalysisUpdatedEvent"
+      discriminator:
+        propertyName: type
+        mapping:
+          match.snapshot: "#/components/schemas/MatchSnapshotEvent"
+          match.started: "#/components/schemas/MatchStartedEvent"
+          move.played: "#/components/schemas/MovePlayedEvent"
+          engine.info: "#/components/schemas/EngineInfoEvent"
+          match.finished: "#/components/schemas/MatchFinishedEvent"
+          analysis.updated: "#/components/schemas/AnalysisUpdatedEvent"
+
+    EventBase:
+      type: object
+      required: [type, matchId, seq, at]
+      properties:
+        type: { type: string }
+        matchId: { type: string }
+        seq: { type: integer, minimum: 0, description: "Monotonic per match; also the SSE id" }
+        at: { type: string, format: date-time }
+
+    MatchSnapshotEvent:
+      allOf:
+        - $ref: "#/components/schemas/EventBase"
+        - type: object
+          required: [type, match]
+          properties:
+            type: { const: match.snapshot }
+            match: { $ref: "#/components/schemas/Match" }
+
+    MatchStartedEvent:
+      allOf:
+        - $ref: "#/components/schemas/EventBase"
+        - type: object
+          required: [type, match]
+          properties:
+            type: { const: match.started }
+            match: { $ref: "#/components/schemas/Match" }
+
+    MovePlayedEvent:
+      allOf:
+        - $ref: "#/components/schemas/EventBase"
+        - type: object
+          required: [type, move]
+          properties:
+            type: { const: move.played }
+            move: { $ref: "#/components/schemas/Move" }
+
+    EngineInfoEvent:
+      allOf:
+        - $ref: "#/components/schemas/EventBase"
+        - type: object
+          required: [type, side, thinking]
+          properties:
+            type: { const: engine.info }
+            side: { type: string, enum: [engine, stockfish] }
+            thinking: { $ref: "#/components/schemas/EngineThinking" }
+
+    MatchFinishedEvent:
+      allOf:
+        - $ref: "#/components/schemas/EventBase"
+        - type: object
+          required: [type, result, outcome, termination]
+          properties:
+            type: { const: match.finished }
+            result: { $ref: "#/components/schemas/Result" }
+            outcome: { $ref: "#/components/schemas/Outcome" }
+            termination: { $ref: "#/components/schemas/Termination" }
+
+    AnalysisUpdatedEvent:
+      allOf:
+        - $ref: "#/components/schemas/EventBase"
+        - type: object
+          required: [type, analysisStatus]
+          properties:
+            type: { const: analysis.updated }
+            analysisStatus: { $ref: "#/components/schemas/AnalysisStatus" }
+            part: { type: string, enum: [engine, gm-coach, engine-dev] }

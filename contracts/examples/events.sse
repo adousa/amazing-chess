@@ -1,0 +1,27 @@
+id: 0
+event: match.started
+data: {"type": "match.started", "matchId": "m_20260925_1500_001", "seq": 0, "at": "2026-09-25T10:00:01Z", "match": {"id": "m_20260925_1500_001", "status": "running", "stockfishElo": 1500, "engineColor": "white", "engineVersion": "0.1.0", "result": "*", "outcome": null, "termination": null, "plyCount": 0, "createdAt": "2026-09-25T10:00:00Z", "startedAt": "2026-09-25T10:00:01Z", "finishedAt": null, "analysisStatus": "pending", "stockfish": {"version": "Stockfish 17.1", "elo": 1500, "limitStrength": true, "moveTimeMs": 5000, "threads": 1, "hashMb": 64}, "engine": {"name": "AmazingChess", "version": "0.1.0", "color": "white", "moveTimeMs": 5000, "options": {"Hash": 64}}, "startFen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", "moves": [], "pgnUrl": "/matches/m_20260925_1500_001/pgn"}}
+
+id: 1
+event: engine.info
+data: {"type": "engine.info", "matchId": "m_20260925_1500_001", "seq": 1, "at": "2026-09-25T10:00:03Z", "side": "engine", "thinking": {"scoreCp": 35, "mateIn": null, "depth": 14, "nodes": 2500000, "nps": 1250000, "pv": ["e2e4", "e7e5", "g1f3"]}}
+
+id: 2
+event: move.played
+data: {"type": "move.played", "matchId": "m_20260925_1500_001", "seq": 2, "at": "2026-09-25T10:00:06Z", "move": {"ply": 1, "color": "white", "by": "engine", "san": "e4", "uci": "e2e4", "fenAfter": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1", "timeMs": 4810, "thinking": {"scoreCp": 30, "mateIn": null, "depth": 18, "seldepth": 26, "nodes": 6200000, "nps": 1290000, "pv": ["e2e4"]}}}
+
+id: 3
+event: move.played
+data: {"type": "move.played", "matchId": "m_20260925_1500_001", "seq": 3, "at": "2026-09-25T10:00:09Z", "move": {"ply": 2, "color": "black", "by": "stockfish", "san": "e5", "uci": "e7e5", "fenAfter": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2", "timeMs": 3021}}
+
+id: 4
+event: match.finished
+data: {"type": "match.finished", "matchId": "m_20260925_1500_001", "seq": 4, "at": "2026-09-25T10:00:26Z", "result": "1-0", "outcome": "win", "termination": "checkmate"}
+
+id: 5
+event: analysis.updated
+data: {"type": "analysis.updated", "matchId": "m_20260925_1500_001", "seq": 5, "at": "2026-09-25T10:00:40Z", "analysisStatus": "running", "part": "engine"}
+
+id: 6
+event: analysis.updated
+data: {"type": "analysis.updated", "matchId": "m_20260925_1500_001", "seq": 6, "at": "2026-09-25T10:01:40Z", "analysisStatus": "ready"}

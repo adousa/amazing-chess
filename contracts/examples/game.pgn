@@ -1,0 +1,17 @@
+[Event "Amazing Chess vs Stockfish"]
+[Site "local"]
+[Date "2026.09.25"]
+[Round "1"]
+[White "AmazingChess 0.1.0"]
+[Black "Stockfish 17.1 (Elo 1500)"]
+[Result "1-0"]
+[StockfishElo "1500"]
+[EngineColor "white"]
+[EngineVersion "0.1.0"]
+[TimeControl "5s/move"]
+[Termination "checkmate"]
+[MatchId "m_20260925_1500_001"]
+[UTCDate "2026.09.25"]
+[UTCTime "10:00:01"]
+
+1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7# 1-0

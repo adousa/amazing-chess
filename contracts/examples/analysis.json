@@ -1,0 +1,121 @@
+{
+  "matchId": "m_20260925_1500_001",
+  "status": "ready",
+  "analyzer": {
+    "engine": "Stockfish 17.1",
+    "depth": 20
+  },
+  "moves": [
+    {
+      "ply": 1,
+      "evalCp": 35,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "book"
+    },
+    {
+      "ply": 2,
+      "evalCp": 30,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "book"
+    },
+    {
+      "ply": 3,
+      "evalCp": 28,
+      "mateIn": null,
+      "cpLoss": 12,
+      "classification": "good"
+    },
+    {
+      "ply": 4,
+      "evalCp": 40,
+      "mateIn": null,
+      "cpLoss": 5,
+      "classification": "good"
+    },
+    {
+      "ply": 5,
+      "evalCp": 390,
+      "mateIn": null,
+      "cpLoss": 40,
+      "classification": "inaccuracy"
+    },
+    {
+      "ply": 6,
+      "evalCp": 650,
+      "mateIn": null,
+      "cpLoss": 900,
+      "classification": "blunder",
+      "bestMoveUci": "g7g6",
+      "bestMoveSan": "g6"
+    },
+    {
+      "ply": 7,
+      "evalCp": null,
+      "mateIn": 0,
+      "cpLoss": 0,
+      "classification": "best"
+    }
+  ],
+  "summary": {
+    "engineAccuracy": 91.4,
+    "stockfishAccuracy": 58.2,
+    "decisivePly": 6,
+    "opening": "C23 Bishop's Opening"
+  },
+  "reports": {
+    "gmCoach": {
+      "agent": "gm-coach",
+      "status": "ready",
+      "summary": "A quick win that relied on a random blunder by limited Stockfish. **3.Qh5** is objectively dubious; against stronger levels it just loses time.",
+      "keyMoments": [
+        {
+          "ply": 5,
+          "comment": "Early queen sortie. Works at 1500, will be punished at 2000+."
+        },
+        {
+          "ply": 6,
+          "comment": "...Nf6?? ignores the mate on f7; ...g6 or ...Qe7 holds."
+        }
+      ],
+      "suggestions": [
+        {
+          "title": "Use a real opening book",
+          "detail": "Replace the early-queen line with a solid repertoire (e.g. 1.e4 \u2192 Italian/Ruy Lopez) so the engine reaches playable middlegames at higher Elo.",
+          "priority": "high",
+          "category": "opening",
+          "relatedPlies": [
+            5
+          ]
+        }
+      ],
+      "createdAt": "2026-09-25T10:01:30Z"
+    },
+    "engineDev": {
+      "agent": "engine-dev",
+      "status": "ready",
+      "summary": "Search found the mate instantly. Time use is wasteful: 4.8 s spent on book-like moves.",
+      "keyMoments": [
+        {
+          "ply": 1,
+          "comment": "4810 ms on move 1: add an opening book or a soft time limit for early moves."
+        }
+      ],
+      "suggestions": [
+        {
+          "title": "Soft/hard time limits",
+          "detail": "Stop iterative deepening when the best move has been stable for N iterations (soft ~2.5 s, hard 4.8 s).",
+          "priority": "medium",
+          "category": "time-management",
+          "relatedPlies": [
+            1,
+            3
+          ]
+        }
+      ],
+      "createdAt": "2026-09-25T10:01:40Z"
+    }
+  },
+  "createdAt": "2026-09-25T10:00:40Z"
+}
