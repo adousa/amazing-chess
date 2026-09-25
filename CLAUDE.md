@@ -164,7 +164,7 @@ How to work in parallel: [docs/08-parallel-work.md](docs/08-parallel-work.md).
 ## 📈 Current status
 
 - Highest Stockfish Elo beaten: **1320** — proof game `m_20260925_1320_002` (engine White, 1-0 checkmate, 33 plies)
-- Phase: **1 — qualify end-to-end**, first proof game won + saved + engine-analysed; agent reports being generated
+- Phase: **1 — qualify end-to-end**, first proof game won, saved, analysed and reviewed by both agents
   (see [roadmap](docs/03-roadmap.md)). Engine v0.1.0 (classical alpha-beta), backend, analysis
   skill + both agents, and a *temporary* simple frontend exist. The frontend design/rewrite is next.
 
