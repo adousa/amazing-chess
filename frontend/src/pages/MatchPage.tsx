@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   api,
   eventsUrl,
@@ -14,9 +14,25 @@ import {
 } from '../api/client';
 import { Board } from '../components/Board';
 import { EvalGraph } from '../components/EvalGraph';
+import { capturedByPly, describeMove, START_FEN } from '../chess';
 import { fmtDate, fmtEval } from '../util';
 
-const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+// three.js is only downloaded when a match is opened
+const SealStage = lazy(() => import('../components/SealStage').then((m) => ({ default: m.SealStage })));
+
+type ViewMode = 'shoulder' | 'above' | '2d';
+const VIEW_KEY = 'ac.view';
+const savedView = (): ViewMode => {
+  try {
+    const v = localStorage.getItem(VIEW_KEY);
+    return v === 'above' || v === '2d' ? v : 'shoulder';
+  } catch {
+    return 'shoulder';
+  }
+};
+const KNIGHT = 'The Knight';
+const DEATH = 'Death';
+const RESULT_LINE: Record<string, string> = { win: 'The Knight has won.', loss: 'Death has won.', draw: 'Neither of them wins. A draw.' };
 const BADGE: Partial<Record<AnalyzedMove['classification'], string>> = {
   brilliant: '!!',
   inaccuracy: '?!',
@@ -37,6 +53,21 @@ export function MatchPage({ id }: { id: string }) {
   const [thinking, setThinking] = useState<{ side: string; thinking: EngineThinking }>();
   const [analysis, setAnalysis] = useState<Analysis>();
   const [analysisError, setAnalysisError] = useState<string>();
+  const [view, setView] = useState<ViewMode>(savedView);
+  const [intro, setIntro] = useState(true);
+  const [stepMs, setStepMs] = useState(1300);
+  const chooseView = (v: ViewMode) => {
+    setView(v);
+    try {
+      localStorage.setItem(VIEW_KEY, v);
+    } catch {
+      /* private mode: not remembered */
+    }
+  };
+  useEffect(() => {
+    const t = setTimeout(() => setIntro(false), 3800);
+    return () => clearTimeout(t);
+  }, [id]);
 
   // ---- load match -------------------------------------------------------
   useEffect(() => {
@@ -149,6 +180,7 @@ export function MatchPage({ id }: { id: string }) {
       if (e.key in map) {
         e.preventDefault();
         setAutoplay(false);
+        setStepMs(e.repeat ? 0 : 1300);
         goto(map[e.key]);
       }
     };
@@ -162,9 +194,15 @@ export function MatchPage({ id }: { id: string }) {
       setAutoplay(false);
       return;
     }
-    const t = setTimeout(() => goto(ply + 1), speed);
+    const t = setTimeout(() => {
+      setStepMs(Math.min(speed * 0.85, 1600));
+      goto(ply + 1);
+    }, speed);
     return () => clearTimeout(t);
   }, [autoplay, ply, n, speed, goto]);
+
+  const startFen = match?.startFen ?? START_FEN;
+  const captured = useMemo(() => capturedByPly(moves, startFen), [moves, startFen]);
 
   const byPly = useMemo(() => {
     const m = new Map<number, AnalyzedMove>();
@@ -176,9 +214,9 @@ export function MatchPage({ id }: { id: string }) {
   if (!match) return <p>Loading…</p>;
 
   const cur = ply > 0 ? moves[ply - 1] : undefined;
-  const fen = cur?.fenAfter ?? match.startFen ?? START_FEN;
+  const fen = cur?.fenAfter ?? startFen;
   const engineName = `${match.engine?.name ?? 'AmazingChess'} v${match.engineVersion}`;
-  const sfName = `Stockfish (${match.stockfishElo})`;
+  const sfName = `Stockfish ${match.stockfishElo}`;
   const white = match.engineColor === 'white' ? engineName : sfName;
   const black = match.engineColor === 'white' ? sfName : engineName;
   const orientation = (match.engineColor === 'black') !== flipped ? 'black' : 'white';
@@ -188,62 +226,150 @@ export function MatchPage({ id }: { id: string }) {
     const m = moves[p - 1];
     return m ? `${Math.ceil(p / 2)}.${m.color === 'black' ? '..' : ''} ${m.san}` : `ply ${p}`;
   };
+  const who = (m?: Move) => (m?.by === 'engine' ? KNIGHT : DEATH);
+  const active = isActive(match.status);
+  const thinkingSide = active && thinking ? (thinking.side as 'engine' | 'stockfish') : null;
+  const atEnd = !active && ply === n && !!match.outcome;
+  const step = (p: number, ms = 1300) => {
+    setAutoplay(false);
+    setStepMs(ms);
+    goto(p);
+  };
+  const liveMs = live && follow ? 1500 : stepMs;
+
+  const overlay = (
+    <>
+      <div className="stage-name far">
+        <span className="who">{DEATH}</span>
+        <span className="what">{sfName}</span>
+      </div>
+      <div className="stage-name near">
+        <span className="who">{KNIGHT}</span>
+        <span className="what">{engineName}</span>
+      </div>
+      <div className="stage-status">
+        {live && active && <span className="tag live">live</span>}
+        {thinkingSide && (
+          <span className="thinking">
+            {thinkingSide === 'engine' ? KNIGHT : DEATH} is thinking
+            {thinking?.thinking.depth ? ` · depth ${thinking.thinking.depth}` : ''}
+          </span>
+        )}
+        <span className="plyno">
+          {ply}/{n}
+        </span>
+      </div>
+      {cur && !intro && (
+        <div className="subtitle" key={cur.ply}>
+          <div>{describeMove(moves, cur.ply, startFen, who(cur))}</div>
+          <div className="sub2">
+            {sanAt(cur.ply)}
+            {curA && BADGE[curA.classification] && <span className={`cls ${curA.classification}`}> {BADGE[curA.classification]} {curA.classification}</span>}
+          </div>
+        </div>
+      )}
+      {intro && (
+        <div className="titlecard">
+          <div className="t1">{KNIGHT}</div>
+          <div className="t2">plays chess with</div>
+          <div className="t1">{DEATH}</div>
+          <div className="t3">
+            {engineName} against Stockfish at Elo {match.stockfishElo} · {fmtDate(match.startedAt ?? match.createdAt)}
+          </div>
+        </div>
+      )}
+      {atEnd && !intro && (
+        <div className="titlecard ending">
+          <div className="t1">{RESULT_LINE[match.outcome!]}</div>
+          <div className="t3">
+            {match.result} {match.termination && <>· by {match.termination}</>}
+          </div>
+        </div>
+      )}
+    </>
+  );
 
   return (
-    <div>
-      <h2>
-        {white} vs {black}
-      </h2>
-      <p>
-        <b>{match.result ?? '*'}</b> {match.outcome && <span className={`tag ${match.outcome}`}>{match.outcome}</span>}{' '}
-        {match.termination && <span>by {match.termination}</span>} · status <b>{match.status}</b>
-        {live && isActive(match.status) && <span className="tag live">LIVE</span>} · {fmtDate(match.startedAt ?? match.createdAt)} ·{' '}
-        <a href={pgnUrl(match.id)} download={`${match.id}.pgn`}>
-          Download PGN
-        </a>
-        {isActive(match.status) && (
-          <>
-            {' '}
-            · <button onClick={() => api.abortMatch(match.id).catch((e: Error) => alert(e.message))}>Abort</button>
-          </>
-        )}
-      </p>
-      <p className="muted">
-        Stockfish {match.stockfish?.version ?? ''} UCI_Elo {match.stockfish?.elo} (limitStrength), {match.stockfish?.moveTimeMs} ms/move ·
-        our engine {match.engine?.moveTimeMs} ms/move · id {match.id}
-      </p>
+    <div className="match">
+      <div className="match-head">
+        <h2>
+          {white} <span className="vs">vs</span> {black}
+        </h2>
+        <p className="muted">
+          <b>{match.result ?? '*'}</b> {match.outcome && <span className={`tag ${match.outcome}`}>{match.outcome}</span>}{' '}
+          {match.termination && <span>by {match.termination}</span>} · {match.status} · {fmtDate(match.startedAt ?? match.createdAt)} ·{' '}
+          <a href={pgnUrl(match.id)} download={`${match.id}.pgn`}>
+            PGN
+          </a>
+          {active && (
+            <>
+              {' '}
+              · <button onClick={() => api.abortMatch(match.id).catch((e: Error) => alert(e.message))}>Abort</button>
+            </>
+          )}
+        </p>
+      </div>
 
       <div className="replay">
-        <div>
-          <Board fen={fen} lastMoveUci={cur?.uci} orientation={orientation} arrowUci={nextBest} />
+        <div className="replay-main">
+          {view === '2d' ? (
+            <div className="board2d">
+              <Board fen={fen} lastMoveUci={cur?.uci} orientation={orientation} arrowUci={nextBest} size={520} />
+            </div>
+          ) : (
+            <Suspense fallback={<div className="stage" />}>
+              <SealStage
+                moves={moves}
+                ply={ply}
+                startFen={startFen}
+                captured={captured[ply] ?? { w: [], b: [] }}
+                ourColor={match.engineColor}
+                view={view}
+                animMs={liveMs}
+                thinking={thinkingSide}
+                onUnsupported={() => chooseView('2d')}
+              >
+                {overlay}
+              </SealStage>
+            </Suspense>
+          )}
           <div className="controls">
-            <button onClick={() => goto(0)} title="Home">⏮</button>
-            <button onClick={() => goto(ply - 1)} title="←">◀</button>
-            <button onClick={() => goto(ply + 1)} title="→">▶</button>
-            <button onClick={() => goto(n)} title="End">⏭</button>
-            <button onClick={() => (ply >= n ? (goto(0), setAutoplay(true)) : setAutoplay((a) => !a))}>
-              {autoplay ? 'Pause' : 'Autoplay'}
+            <button onClick={() => step(0)} title="Start (Home)">⏮</button>
+            <button onClick={() => step(ply - 1)} title="Back (←)">◀</button>
+            <button onClick={() => step(ply + 1)} title="Forward (→)">▶</button>
+            <button onClick={() => step(n)} title="End (End)">⏭</button>
+            <button className="primary" onClick={() => (ply >= n ? (goto(0), setAutoplay(true)) : setAutoplay((a) => !a))}>
+              {autoplay ? 'Pause' : 'Play'}
             </button>
-            <select value={speed} onChange={(e) => setSpeed(Number(e.target.value))}>
-              <option value={2000}>0.5×</option>
-              <option value={1000}>1×</option>
-              <option value={500}>2×</option>
-              <option value={250}>4×</option>
+            <select value={speed} onChange={(e) => setSpeed(Number(e.target.value))} title="Autoplay speed">
+              <option value={3000}>slow</option>
+              <option value={2000}>calm</option>
+              <option value={1000}>brisk</option>
+              <option value={500}>fast</option>
             </select>
-            <button onClick={() => setFlipped((f) => !f)}>Flip</button>
-            <span className="muted">
-              ply {ply}/{n}
-            </span>
+            <span className="spacer" />
+            <div className="seg" role="group" aria-label="View">
+              {(['shoulder', 'above', '2d'] as const).map((v) => (
+                <button key={v} className={view === v ? 'on' : ''} onClick={() => chooseView(v)}>
+                  {v === 'shoulder' ? 'Shoulder' : v === 'above' ? 'Above' : '2D'}
+                </button>
+              ))}
+            </div>
+            {view === '2d' && <button onClick={() => setFlipped((f) => !f)}>Flip</button>}
           </div>
+        </div>
+
+        <div className="side">
+          <MoveList moves={moves} ply={ply} byPly={byPly} onJump={(p) => step(p, 0)} />
+          {byPly.size > 0 && <EvalGraph analysis={[...byPly.values()]} plies={n} ply={ply} onJump={(p) => step(p, 0)} />}
           {cur && (
             <div className="panel">
-              <b>{sanAt(cur.ply)}</b> by {cur.by} in {cur.timeMs} ms
+              <b>{sanAt(cur.ply)}</b> by {who(cur)} in {(cur.timeMs / 1000).toFixed(1)} s
               {cur.thinking && (
-                <span className="muted">
-                  {' '}
-                  · depth {cur.thinking.depth} · score {fmtEval(cur.thinking.scoreCp, cur.thinking.mateIn)} (mover)
+                <div className="muted">
+                  depth {cur.thinking.depth} · score {fmtEval(cur.thinking.scoreCp, cur.thinking.mateIn)} (mover)
                   {cur.thinking.nps ? ` · ${Math.round(cur.thinking.nps / 1000)} knps` : ''}
-                </span>
+                </div>
               )}
               {curA && (
                 <div>
@@ -254,20 +380,15 @@ export function MatchPage({ id }: { id: string }) {
               )}
             </div>
           )}
-          {nextBest && <p className="muted">Green arrow: analysis best move in this position.</p>}
-          {thinking && isActive(match.status) && (
-            <div className="panel">
-              {thinking.side} thinking: depth {thinking.thinking.depth ?? '?'} · score{' '}
+          {thinking && active && (
+            <div className="panel muted">
+              {thinking.side === 'engine' ? KNIGHT : DEATH}: depth {thinking.thinking.depth ?? '?'} · score{' '}
               {fmtEval(thinking.thinking.scoreCp, thinking.thinking.mateIn)}
               {thinking.thinking.nodes ? ` · ${thinking.thinking.nodes} nodes` : ''}
               {thinking.thinking.pv?.length ? ` · pv ${thinking.thinking.pv.slice(0, 6).join(' ')}` : ''}
             </div>
           )}
-        </div>
-
-        <div className="side">
-          <MoveList moves={moves} ply={ply} byPly={byPly} onJump={goto} />
-          {byPly.size > 0 && <EvalGraph analysis={[...byPly.values()]} plies={n} ply={ply} onJump={goto} />}
+          <p className="muted small">← → step · Home / End · the players play each move forward.</p>
         </div>
       </div>
 
@@ -277,7 +398,7 @@ export function MatchPage({ id }: { id: string }) {
         status={aStatus}
         error={analysisError}
         sanAt={sanAt}
-        onJump={goto}
+        onJump={(p) => step(p, 0)}
         onRerun={() => api.rerunAnalysis(match.id).then(setAnalysis).catch((e: Error) => alert(e.message))}
       />
     </div>

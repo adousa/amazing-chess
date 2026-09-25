@@ -63,6 +63,15 @@ Background, rules and strategy: [docs/00-overview.md](docs/00-overview.md).
 - Any saved game can be replayed **from the first move to the last** on a graphical chessboard.
 - The viewer can step forward/back, jump to start/end, jump to any move and autoplay.
 - The replay shows the move list, the players (incl. Stockfish Elo) and the result.
+- The board is staged as an homage to *The Seventh Seal*: a black-and-white, overcast, empty stony
+  beach by the sea with only the two players and the board. Our engine is **the Knight** and
+  Stockfish is **Death**. The default view is from the Knight's side, with Death and the board
+  clearly in front of him.
+- **The two players play the moves:** when a game steps forward (replay, autoplay or live) the moving
+  player reaches out, picks up the piece and sets it down. Captured pieces are placed beside the
+  board, and castling, en passant and promotion are played out.
+- Each move is also given as a subtitle in words (e.g. "Death takes the pawn on e4 with the knight").
+- A plain 2D board is always available as an alternative view, and is used when 3D is not supported.
 
 ### 5. Analyse every game
 - After **each** game an **analysis skill** runs automatically on it.
@@ -166,12 +175,17 @@ How to work in parallel: [docs/08-parallel-work.md](docs/08-parallel-work.md).
 - Highest Stockfish Elo beaten: **1320** — proof game `m_20260925_1320_002` (engine White, 1-0 checkmate, 33 plies)
 - Phase: **1 — qualify end-to-end**, first proof game won, saved, analysed and reviewed by both agents
   (see [roadmap](docs/03-roadmap.md)). Engine v0.1.0 (classical alpha-beta), backend, analysis
-  skill + both agents, and a *temporary* simple frontend exist. The frontend design/rewrite is next.
+  skill + both agents exist. The frontend now has the *Seventh Seal* replay/live stage; the ladder
+  and stats pages are restyled but not yet redesigned.
 
 ---
 
 ## Changelog
 
+- 2026-09-25 — Frontend: *Seventh Seal* stage for replay/live. Black-and-white 3D beach, the Knight
+  (our engine) vs Death (Stockfish), and both players physically play each move. Also move
+  subtitles, title/ending cards, Shoulder/Above/2D views, and a period black-and-white style across
+  the app. No contract change. See [ADR 0004](docs/decisions/0004-seventh-seal-3d-stage.md).
 <!-- Newest first. One line per change: date — what changed (PR/commit). -->
 - 2026-09-25 — Phase 1 build: engine v0.1.0 (Rust, UCI, perft-verified, never exceeds 5 s),
   backend (match runner vs limited Stockfish, append-only game store, analysis after every game,
