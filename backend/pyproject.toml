@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "amazing-chess-backend"
+version = "0.1.0"
+description = "Amazing Chess backend: match runner vs limited Stockfish, game store, analysis, HTTP API"
+requires-python = ">=3.9"
+dependencies = [
+  "chess>=1.10",
+  "fastapi>=0.110",
+  "uvicorn[standard]>=0.29",
+  "pydantic>=2",
+]
+
+[project.optional-dependencies]
+test = ["pytest", "httpx", "pyyaml", "jsonschema", "referencing"]
+
+[tool.setuptools]
+packages = ["amazing"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

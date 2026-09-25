@@ -1,0 +1,27 @@
+[package]
+name = "amazing-chess"
+version = "0.1.0"
+edition = "2021"
+description = "AmazingChess - our own UCI chess engine (bitboards, alpha-beta, PeSTO eval)"
+authors = ["amazing-chess team"]
+publish = false
+
+[[bin]]
+name = "amazing-chess"
+path = "src/main.rs"
+
+[lib]
+name = "amazing_chess"
+path = "src/lib.rs"
+
+[dependencies]
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+debug = false
+
+[profile.test]
+opt-level = 3

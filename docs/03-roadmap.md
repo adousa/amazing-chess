@@ -7,7 +7,7 @@ Tick items here (or link issues) as they land, and update the status in `CLAUDE.
 - [x] Repo, `CLAUDE.md`, docs
 - [x] Backend ↔ frontend contract v0.1.0 + examples + validator
 
-## Phase 1 — Qualify end-to-end (hours, not days)
+## Phase 1 — Qualify end-to-end (hours, not days) — 🟡 code done, proof game pending
 Goal: every competition rule satisfied with a trivial player.
 
 | Track | Steps |

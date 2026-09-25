@@ -163,12 +163,18 @@ How to work in parallel: [docs/08-parallel-work.md](docs/08-parallel-work.md).
 
 ## 📈 Current status
 
-- Highest Stockfish Elo beaten: **none yet**
-- Phase: **0 — repository set up** (see [roadmap](docs/03-roadmap.md))
+- Highest Stockfish Elo beaten: **none yet** (first 5 s/move game at Elo 1320 in progress)
+- Phase: **1 — qualify end-to-end**, code complete, awaiting the first saved + analysed proof game
+  (see [roadmap](docs/03-roadmap.md)). Engine v0.1.0 (classical alpha-beta), backend, analysis
+  skill + both agents, and a *temporary* simple frontend exist. The frontend design/rewrite is next.
 
 ---
 
 ## Changelog
 
 <!-- Newest first. One line per change: date — what changed (PR/commit). -->
+- 2026-09-25 — Phase 1 build: engine v0.1.0 (Rust, UCI, perft-verified, never exceeds 5 s),
+  backend (match runner vs limited Stockfish, append-only game store, analysis after every game,
+  API + SSE per contract v0.1.0), `/analyze-game` skill + `gm-coach` / `engine-dev` agents,
+  improvement backlog (`docs/backlog.md`), `/ladder-loop` skill, simple placeholder frontend.
 - 2026-09-25 — Repository initialised: CLAUDE.md, docs, backend↔frontend contract v0.1.0.
