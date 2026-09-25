@@ -1,0 +1,36 @@
+body { font-family: system-ui, sans-serif; margin: 0; color: #222; font-size: 14px; }
+header { display: flex; gap: 16px; align-items: center; padding: 10px 20px; background: #2b2b2b; color: #fff; }
+header a { color: #ccc; text-decoration: none; }
+header a.active { color: #fff; text-decoration: underline; }
+header .muted { margin-left: auto; color: #999; }
+main { padding: 16px 20px; }
+.muted { color: #777; }
+.error { color: #c00; }
+.pre { white-space: pre-wrap; }
+.panel { border: 1px solid #ddd; border-radius: 4px; padding: 8px 10px; margin: 8px 0; }
+.panel.big { font-size: 20px; }
+.form { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.form input[type='number'] { width: 80px; }
+table.grid { border-collapse: collapse; }
+table.grid th, table.grid td { border-bottom: 1px solid #eee; padding: 4px 10px; text-align: left; }
+.tag { display: inline-block; padding: 0 6px; border-radius: 3px; background: #eee; font-size: 12px; margin: 0 2px; }
+.tag.win { background: #cfc; } .tag.draw { background: #eee; } .tag.loss { background: #fcc; }
+.tag.live { background: #c00; color: #fff; }
+.tag.prio-high { background: #fcc; } .tag.prio-medium { background: #ffe0a0; } .tag.prio-low { background: #e0f0ff; }
+.state-beaten td { background: #efe; }
+.replay { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+.replay .side { width: 320px; }
+.controls { display: flex; gap: 6px; align-items: center; margin-top: 8px; }
+.movelist { max-height: 400px; overflow-y: auto; border: 1px solid #ddd; }
+.movelist table { width: 100%; border-collapse: collapse; }
+.movelist td { padding: 2px 6px; }
+.mv { cursor: pointer; }
+.mv:hover { background: #eef; }
+.mv.cur { background: #cde; font-weight: bold; }
+.mv.engine { color: #036; }
+.cls.blunder { color: #c00; font-weight: bold; } .cls.mistake { color: #e70; font-weight: bold; }
+.cls.inaccuracy { color: #b90; } .cls.brilliant { color: #09c; }
+.evalgraph { margin-top: 8px; cursor: pointer; border: 1px solid #ddd; }
+.reports { display: flex; gap: 16px; flex-wrap: wrap; }
+.report { flex: 1 1 400px; }
+a.jump { cursor: pointer; color: #36c; text-decoration: underline; }

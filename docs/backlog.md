@@ -1,0 +1,121 @@
+# Engine improvement backlog
+
+> **Generated file — do not edit by hand.** Source: [`backlog.json`](backlog.json), rendered by
+> `python scripts/backlog.py render`. Items come from the post-game analysis agents
+> (`gm-coach`, `engine-dev`; see [06-analysis-and-agents](06-analysis-and-agents.md)) via
+> `python scripts/backlog.py add <matchId>`, which runs after every `/analyze-game`.
+>
+> Near-identical suggestions are merged and **upvoted** ("Times") instead of duplicated.
+> Rank = priority weight (high 3 · medium 2 · low 1) × times suggested; in-progress and open
+> items first. `/ladder-loop` implements the top open item, measures it against the previous
+> engine version and marks it `done` or `rejected` with
+> `python scripts/backlog.py set-status <id> <status> --note "…"`.
+
+_Last updated: 2026-09-25T09:37:25Z · 8 item(s)_
+
+| # | ID | Title | Category | Priority | Times | Status | First seen | Last seen | Games |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | B001 | Add an opening book for instant moves | opening | high | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
+| 2 | B005 | Add king-in-centre and pawn-shield king safety | evaluation | high | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
+| 3 | B002 | Reward attacks on f7/f2 against uncastled king | middlegame | medium | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
+| 4 | B003 | Penalise early queen trades when not clearly winning | other | medium | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
+| 5 | B006 | Texel-tune evaluation weights on quiet positions | evaluation | medium | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
+| 6 | B007 | Skip iterations predicted to overrun the hard limit | time-management | medium | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
+| 7 | B004 | Spend saved time on critical middlegame moves | other | low | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
+| 8 | B008 | Add a small opening book | other | low | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
+
+## Details
+
+<details>
+<summary><b>B001</b> — Add an opening book for instant moves (<i>opening, high, ×1, open, from gm-coach</i>)</summary>
+
+We spent 2.40 s on 1.e4 and 4.75 s on 2.Nf3 (plies 1 and 3). Pure waste, and a book also locks in the structures we want. As White, start with **1.e4** and store these lines:
+- vs 1…e5: the Ruy Lopez **1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O 9.h3**. It keeps the tension and all the pieces on, and limited SF tends to drift in closed Chigorin/Breyer structures.
+- vs 1…c5: **2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be3** (English Attack). Unbalanced, with plenty of plausible moves for SF to go wrong in.
+- vs 1…e6: **2.d4 d5 3.Nc3**.
+- vs 1…c6: **2.d4 d5 3.e5** (Advance Caro-Kann).
+- vs early 2…Qe7 (this game): **3.Bc4 then Nc3/d4** (the plies 5–15 plan).
+
+Play book moves instantly and switch to search as soon as we leave the book. How to check it worked: zero time spent on book plies in the next games, and the average SF eval at move 10 in our favour.
+
+</details>
+
+<details>
+<summary><b>B005</b> — Add king-in-centre and pawn-shield king safety (<i>evaluation, high, ×1, open, from engine-dev</i>)</summary>
+
+**Where:** `engine/src/eval.rs::eval_side` (the king-safety block around the `king_zone` / `KS_UNITS` code) plus castling rights from `Position`.
+**Now:** king safety is only attack units × attacker count on the king zone. Nothing rewards a pawn shield, and nothing punishes a king still on d/e-file that has lost its castling rights or sits on an open file.
+**Change:** (1) MG-only penalty for a king on files c-f with no castling rights left: start at **-40 cp**, plus **-20 cp** per open or half-open file among the king file and its neighbours. (2) Pawn shield: **+12 cp** per own pawn on the 2nd rank and **+6 cp** per pawn on the 3rd rank in front of a castled king (files ±1). (3) Small bonus **+15 cp** MG for keeping any castling right while the king is still on e1/e8.
+**Why:** at plies 5-17 we were consistently 0.4-1.4 pawns below SF (+0.70/+1.14, +1.34/+2.07, +1.32/+2.36, +1.37/+2.64, +2.43/+3.87). At ply 11 we skipped `6.Ng5!` (SF +3.36 vs d4 +2.51). Our own probe after 6.Ng5 gives only +1.68 for the line Bb7 Nxf7 Rg8 Ng5, where Black permanently loses castling. Against stronger Stockfish levels these are exactly the attacking chances we need to take, because a draw is worth nothing.
+**Verify:** FEN `rnb1kb1r/2ppqppp/p4n2/1p2p3/4P3/1BN2N2/PPPP1PPP/R1BQK2R w KQkq - 2 6` → expect `f3g5` (Ng5) within 4 s movetime (currently d4 at d25, 13M nodes). Then SPRT `fastchess ... -each tc=10+0.1 -rounds 5000 -repeat -concurrency 8 -openings file=books/UHO_Lichess_4852_v1.epd format=epd order=random -sprt elo0=0 elo1=5 alpha=0.05 beta=0.05`.
+**Expected:** +15-35 Elo.
+
+</details>
+
+<details>
+<summary><b>B002</b> — Reward attacks on f7/f2 against uncastled king (<i>middlegame, medium, ×1, open, from gm-coach</i>)</summary>
+
+At ply 11 the engine preferred 6.d4 (+1.32) to **6.Ng5!** (SF +3.34), and at ply 17 it scored Nxe5 at +2.43 against SF's +3.87. Both times it underrated pressure on f7 while Black's king was still on e8 with its castling blocked (Qe7 in front of Bf8).
+
+Proposed eval term: when the enemy king is on its original square or the file next to it, and it hasn't castled:
+- about +15 cp for each of our minor pieces or queen attacking the f7/f2 square;
+- +20 cp more when there's a bishop on the a2-g8 diagonal and a knight on g5/e5 together;
+- about +10 cp for each move the enemy king is kept from castling (its own piece blocking f8/g8, or the king exposed with its castling rights gone).
+
+Test FEN `rnb1kb1r/2ppqppp/p4n2/1p2p3/4P3/1BN2N2/PPPP1PPP/R1BQK2R w KQkq - 2 6`: expect **Ng5** (or at least an eval of +2 or more). Then run a gauntlet at SF 1500 to confirm we don't lose Elo elsewhere.
+
+</details>
+
+<details>
+<summary><b>B003</b> — Penalise early queen trades when not clearly winning (<i>other, medium, ×1, open, from gm-coach</i>)</summary>
+
+This game had no queen trade, but the risk is real. At ply 15 our PV was 8.Nd5 Nxd5 9.Qxd5 c6 10.Qxe5, which is heading for early simplification. Against stronger SF (1800+), trading queens at +1 or less gives an endgame the limited engine defends far better than a middlegame, and a draw is worth nothing to us.
+
+Proposed rule: if eval is between 0 and +150 cp and non-pawn material is still high (both sides have at least 2 minor pieces and both rooks), subtract about 25–40 cp from positions reached by trading queens. Add a contempt of about 30–50 cp so that draws score as losses.
+
+How to check it worked: count how often queens come off before move 25 in games where we were ahead but it ended in a draw. That number should fall.
+
+</details>
+
+<details>
+<summary><b>B006</b> — Texel-tune evaluation weights on quiet positions (<i>evaluation, medium, ×1, open, from engine-dev</i>)</summary>
+
+**Where:** new offline tuner (e.g. `engine/src/bin/tune.rs` or a `tune` feature) over `engine/src/eval.rs` constants (`MG_PST`/`EG_PST`, `MOB_*`, `KS_*`, `PASSED_*`, `TEMPO`).
+**Now:** the weights are hand-set, PeSTO-like, and have never been fitted to our own terms (mobility, king safety and passers were added on top of PeSTO tables).
+**Change:** gather about 1-2M quiet positions (qsearch-resolved, from our self-play or from `analysis.json` of saved games) labelled with the game result. Minimise sigmoid(K·eval) MSE with Adam or coordinate descent, and refit K first. Add development terms before tuning: **-12 cp** MG per minor still on its home square after the opening, and **-20 cp** for a queen in front of a blocked own bishop (the Qe7/Bf8 pattern). Let the tuner set their final weights.
+**Why:** the systematic, same-sign eval gap at plies 5-17 (always 30-50% below SF) comes from mis-weighted and missing terms, not from search. Depth 24-29 was more than enough there.
+**Verify:** fit error on a held-out set goes down. FEN `rnb1kb1r/2p1qppp/p4n2/1p1Np3/4P3/1B3N2/PPP2PPP/R1BQK2R b KQkq - 1 8` (ply 16): our static and d20 eval should move toward SF +2.6 (currently about +1.37). Then SPRT elo0=0 elo1=5 as above.
+**Expected:** +30-80 Elo (a first Texel pass on a hand-tuned HCE is usually the biggest single gain).
+
+</details>
+
+<details>
+<summary><b>B007</b> — Skip iterations predicted to overrun the hard limit (<i>time-management, medium, ×1, open, from engine-dev</i>)</summary>
+
+**Where:** `engine/src/search.rs::think`, the soft-limit block after each completed iteration (`if let Some(soft) = soft_ms { ... }`).
+**Now:** after an iteration completes we check `elapsed >= soft*scale/100` (soft = 60% of hard). If time is under that, a new iteration starts even when it cannot finish before the hard cap (about 4.85 s). Its partial result is used only if a root move has been fully searched.
+**Change:** track the time the last iteration took, `t_last`. Don't start depth d+1 if `elapsed + 1.8 * t_last > hard` (the effective branching factor here is about 1.6-2.0). Optionally raise the base soft limit to about 50% of hard but make it depend on best-move stability, so that stable positions stop earlier and unstable ones keep the full budget.
+**Why:** at plies 3 and 17 we spent **4.75 s**, right at the hard cap. The last reported iterations explain only about 2.25 s (5.42M nodes / 2.40M nps) and about 2.04 s (5.55M / 2.72M). Roughly 2.5 s per move was spent on aborted iterations that produced nothing. Being this close to the 5 s forfeit line also leaves little margin on a loaded machine.
+**Verify:** FEN `rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2` with `go movetime 5000`: expect `bestmove g1f3` and total time below 4.0 s, with the last `info depth` equal to the final depth. Log max/avg time per move over 200 games at 5 s/move (the max must stay below 4.9 s). SPRT at tc=10+0.1 and a fixed `movetime 5000` gauntlet, elo0=0 elo1=5.
+**Expected:** +5-15 Elo at equal time plus a lower forfeit risk; mostly a safety and efficiency fix.
+
+</details>
+
+<details>
+<summary><b>B004</b> — Spend saved time on critical middlegame moves (<i>other, low, ×1, open, from gm-coach</i>)</summary>
+
+We used 4.75 s on 2.Nf3, a trivial move, but only 4.06 s on 6.d4 (ply 11), the one real decision of the opening, where 6.Ng5 was clearly better. Once the book handles the first moves, change time use: give the full 5 s budget (minus a safety margin) when the best move changes between iterations or when two root moves score within about 30 cp of each other, and stop early when the best move has held steady for about 6 iterations. The positions that most need the extra depth are ones like ply 11, where a quiet developing move and a forcing strike are close in score.
+
+Test FEN `rnb1kb1r/2ppqppp/p4n2/1p2p3/4P3/1BN2N2/PPPP1PPP/R1BQK2R w KQkq - 2 6`, expected move Ng5.
+
+</details>
+
+<details>
+<summary><b>B008</b> — Add a small opening book (<i>other, low, ×1, open, from engine-dev</i>)</summary>
+
+**Where:** new `engine/src/book.rs`, probed in `engine/src/uci.rs` before `think`, behind a `OwnBook` UCI option. Use a small Polyglot `.bin` we build ourselves from master games or self-play, not an engine-generated book, to stay within the rules.
+**Why:** plies 1-3 took 2.40 s and 4.75 s just to find e4/Nf3. A book saves that time and, more importantly, lets us **pick sharp, unbalanced openings**. A draw is worth nothing, so we want positions where limited Stockfish goes wrong early, as with 2...Qe7/3...a6/4...b5 here. Rotating a few book lines also stops higher-Elo Stockfish from steering every game into the same drawish structure.
+**Verify:** `position startpos` → `go movetime 5000` returns a book move in under 50 ms. Then a head-to-head at 5 s/move vs Stockfish UCI_Elo 1800 with and without the book (the ladder-loop quick match), plus SPRT elo0=0 elo1=5.
+**Expected:** +0-10 Elo from time alone; the main value is choosing winning-chance openings for the ladder.
+
+</details>

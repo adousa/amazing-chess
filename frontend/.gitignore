@@ -1,0 +1,5 @@
+node_modules/
+dist/
+# generated from ../contracts/openapi.yaml by `npm run gen:api`
+src/api/schema.d.ts
+*.tsbuildinfo

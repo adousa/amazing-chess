@@ -1,0 +1,30 @@
+{
+  "name": "amazing-chess-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:mock": "npm run gen:api && VITE_API_BASE=http://127.0.0.1:4010 vite",
+    "build": "npm run gen:api && tsc -p . && vite build",
+    "preview": "vite preview",
+    "gen:api": "openapi-typescript ../contracts/openapi.yaml -o src/api/schema.d.ts",
+    "mock": "npx --yes @stoplight/prism-cli mock -m false ../contracts/openapi.yaml",
+    "predev": "npm run gen:api",
+    "typecheck": "npm run gen:api && tsc -p ."
+  },
+  "dependencies": {
+    "@lichess-org/chessground": "^10.2.0",
+    "chess.js": "^1.4.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "openapi-typescript": "^7.13.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.1"
+  }
+}

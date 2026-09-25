@@ -23,6 +23,10 @@ depth 15–25. Limited Stockfish injects random mistakes; deep tactical search p
 - Version string (`id name AmazingChess <version>`) is recorded with every game.
 
 ## Feature roadmap (build in this order)
+
+> **Status (v0.1.0, 2026-09-25):** items **1–12 and 16 done** in `engine/` (Rust, perft-verified; see
+> [engine/README.md](../engine/README.md) for measured results). Not started: 13 (book), 14 (Syzygy), 15 (NNUE).
+
 Typical Elo gains for hobby engines (Chess Programming Wiki / community experience):
 
 1. **Bitboards + legal move generation**, verified with **perft** — correctness first
