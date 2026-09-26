@@ -184,8 +184,8 @@ How to work in parallel: [docs/08-parallel-work.md](docs/08-parallel-work.md).
 
 - Highest Stockfish Elo beaten: **3190** (the maximum) — proof game `m_20260926_3190_005` (engine v0.2.0 White, 1-0 checkmate, 131 plies, Contempt 60)
 - Wins out of 10 at 3190 (competition scoring), engine v0.2.0, Contempt 60:
-  1 thread: 1 W / 0 D / 5 L (6 games; the restart interrupted 4). 3 threads: 0 W / 1 D / 5 L after 6 of 10
-  (still running). The losses are decided in the middlegame (plies 36–62). A stronger evaluation (own NNUE) is the next step.
+  1 thread: 1 W / 0 D / 5 L (6 games; the restart interrupted 4). 3 threads: 0 W / 3 D / 7 L over 10
+  (White 0/3/2, Black 0/0/5). The losses are decided in the middlegame (plies 36–62). A stronger evaluation (own NNUE) is the next step.
 - Phase: **1 — qualify end-to-end**, first proof game won, saved, analysed and reviewed by both agents
   (see [roadmap](docs/03-roadmap.md)). Engine v0.2.0 (classical alpha-beta + correction history), backend,
   analysis skill + both agents exist. The frontend now has the *Seventh Seal* replay/live stage; the ladder
