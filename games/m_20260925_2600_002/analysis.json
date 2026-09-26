@@ -1,0 +1,81 @@
+{
+  "matchId": "m_20260925_2600_002",
+  "status": "ready",
+  "analyzer": {
+    "engine": "Stockfish 19",
+    "depth": 18
+  },
+  "moves": [
+    {
+      "ply": 1,
+      "evalCp": 28,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "book",
+      "bestMoveUci": "e2e4",
+      "bestMoveSan": "e4"
+    },
+    {
+      "ply": 2,
+      "evalCp": 62,
+      "mateIn": null,
+      "cpLoss": 34,
+      "classification": "book",
+      "bestMoveUci": "e7e5",
+      "bestMoveSan": "e5"
+    },
+    {
+      "ply": 3,
+      "evalCp": -5,
+      "mateIn": null,
+      "cpLoss": 67,
+      "classification": "inaccuracy",
+      "bestMoveUci": "e4d5",
+      "bestMoveSan": "exd5"
+    },
+    {
+      "ply": 4,
+      "evalCp": -4,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "c7c5",
+      "bestMoveSan": "c5"
+    },
+    {
+      "ply": 5,
+      "evalCp": -7,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "c2c3",
+      "bestMoveSan": "c3"
+    },
+    {
+      "ply": 6,
+      "evalCp": 6,
+      "mateIn": null,
+      "cpLoss": 13,
+      "classification": "excellent",
+      "bestMoveUci": "c8f5",
+      "bestMoveSan": "Bf5"
+    }
+  ],
+  "summary": {
+    "decisivePly": 3,
+    "opening": "B01 Scandinavian Defense",
+    "engineAccuracy": 93.1,
+    "stockfishAccuracy": 86.1
+  },
+  "reports": {
+    "gmCoach": {
+      "agent": "gm-coach",
+      "status": "pending"
+    },
+    "engineDev": {
+      "agent": "engine-dev",
+      "status": "pending"
+    }
+  },
+  "createdAt": "2026-09-25T17:52:25Z"
+}

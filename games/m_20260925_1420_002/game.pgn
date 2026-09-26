@@ -1,0 +1,45 @@
+[Event "Amazing Chess vs Stockfish"]
+[Site "local"]
+[Date "2026.09.25"]
+[Round "-"]
+[White "Stockfish 19 (Elo 1420)"]
+[Black "AmazingChess 0.1.0"]
+[Result "0-1"]
+[StockfishElo "1420"]
+[WhiteElo "1420"]
+[EngineColor "black"]
+[EngineVersion "0.1.0"]
+[StockfishVersion "Stockfish 19"]
+[StockfishSettings "UCI_LimitStrength=true UCI_Elo=1420 Threads=1 Hash=64"]
+[TimeControl "5s/move"]
+[MoveTime "5000"]
+[Termination "checkmate"]
+[MatchId "m_20260925_1420_002"]
+[UTCDate "2026.09.25"]
+[UTCTime "10:16:26"]
+
+1. d4 { [%emt 0:00:04.90] } 1... d5 { [%emt 0:00:03.86] } 2. c4
+{ [%emt 0:00:04.90] } 2... Nf6 { [%emt 0:00:02.64] } 3. Nf3
+{ [%emt 0:00:04.90] } 3... c6 { [%emt 0:00:03.88] } 4. Bf4
+{ [%emt 0:00:04.90] } 4... dxc4 { [%emt 0:00:02.29] } 5. Qc2
+{ [%emt 0:00:04.90] } 5... b5 { [%emt 0:00:02.87] } 6. a4 { [%emt 0:00:04.90] }
+6... Na6 { [%emt 0:00:04.22] } 7. b3 { [%emt 0:00:04.90] } 7... Nb4
+{ [%emt 0:00:02.32] } 8. Qc3 { [%emt 0:00:04.90] } 8... Nfd5
+{ [%emt 0:00:03.62] } 9. Qc1 { [%emt 0:00:04.90] } 9... Nxf4
+{ [%emt 0:00:02.58] } 10. axb5 { [%emt 0:00:04.90] } 10... cxb3
+{ [%emt 0:00:04.75] } 11. Qxf4 { [%emt 0:00:04.90] } 11... Nc2+
+{ [%emt 0:00:02.35] } 12. Kd1 { [%emt 0:00:04.90] } 12... Nxa1
+{ [%emt 0:00:02.91] } 13. g4 { [%emt 0:00:04.90] } 13... Be6
+{ [%emt 0:00:02.32] } 14. e3 { [%emt 0:00:04.90] } 14... b2
+{ [%emt 0:00:02.79] } 15. Bd3 { [%emt 0:00:04.90] } 15... Qa5
+{ [%emt 0:00:04.75] } 16. h3 { [%emt 0:00:04.90] } 16... Qa4+
+{ [%emt 0:00:03.28] } 17. Ke1 { [%emt 0:00:04.90] } 17... Nb3
+{ [%emt 0:00:04.67] } 18. Ng5 { [%emt 0:00:04.90] } 18... Bd5
+{ [%emt 0:00:03.56] } 19. Nc3 { [%emt 0:00:04.90] } 19... Qb4
+{ [%emt 0:00:02.58] } 20. Ne4 { [%emt 0:00:04.90] } 20... Bxe4
+{ [%emt 0:00:03.38] } 21. Ke2 { [%emt 0:00:04.90] } 21... Bxh1
+{ [%emt 0:00:02.40] } 22. Bc2 { [%emt 0:00:04.90] } 22... Qxc3
+{ [%emt 0:00:00.16] } 23. Qb8+ { [%emt 0:00:04.90] } 23... Rxb8
+{ [%emt 0:00:00.00] } 24. Bd3 { [%emt 0:00:00.17] } 24... Qd2+
+{ [%emt 0:00:00.00] } 25. Kf1 { [%emt 0:00:00.07] } 25... Qd1#
+{ [%emt 0:00:00.00] } 0-1

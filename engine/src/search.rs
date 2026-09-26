@@ -67,6 +67,7 @@ pub struct Searcher {
     pub id: usize,
     history: Box<[[[i32; 64]; 64]; 2]>,
     cont_hist: Box<[i16]>,
+    corr_hist: Box<[[i32; CORR_SIZE]; 2]>,
     counter: Box<[[Move; 64]; 12]>,
     killers: [[Move; 2]; MAX_PLY + 2],
     stack: [StackEntry; MAX_PLY + 4],
@@ -86,6 +87,18 @@ pub struct Searcher {
     shared: Arc<Shared>,
     tt: Arc<TT>,
     pub silent: bool,
+}
+
+// Pawn-structure correction history: learns how far static eval is off per pawn structure.
+const CORR_SIZE: usize = 16384;
+const CORR_GRAIN: i32 = 256;
+const CORR_MAX: i32 = 32 * CORR_GRAIN;
+
+#[inline]
+fn pawn_index(pos: &Position) -> usize {
+    let w = pos.pieces(WHITE, PAWN).wrapping_mul(0x9E37_79B9_7F4A_7C15);
+    let b = pos.pieces(BLACK, PAWN).wrapping_mul(0xC2B2_AE3D_27D4_EB4F);
+    ((w ^ b.rotate_left(29)) >> 50) as usize & (CORR_SIZE - 1)
 }
 
 static LMR: std::sync::OnceLock<[[i32; 64]; 64]> = std::sync::OnceLock::new();
@@ -177,6 +190,7 @@ impl Searcher {
             id,
             history: Box::new([[[0; 64]; 64]; 2]),
             cont_hist: vec![0i16; CONT_SIZE].into_boxed_slice(),
+            corr_hist: Box::new([[0; CORR_SIZE]; 2]),
             counter: Box::new([[Move::NONE; 64]; 12]),
             killers: [[Move::NONE; 2]; MAX_PLY + 2],
             stack: [StackEntry { eval: EVAL_NONE, mv: Move::NONE, piece: NO_PIECE }; MAX_PLY + 4],
@@ -207,6 +221,7 @@ impl Searcher {
     pub fn clear(&mut self) {
         *self.history = [[[0; 64]; 64]; 2];
         self.cont_hist.iter_mut().for_each(|x| *x = 0);
+        *self.corr_hist = [[0; CORR_SIZE]; 2];
         *self.counter = [[Move::NONE; 64]; 12];
         self.killers = [[Move::NONE; 2]; MAX_PLY + 2];
     }
@@ -586,16 +601,21 @@ impl Searcher {
 
         // ---- Static evaluation ----
         let raw_eval;
+        let static_eval;
         let mut eval;
+        let pidx = pawn_index(pos);
         if in_check {
             raw_eval = EVAL_NONE;
+            static_eval = EVAL_NONE;
             eval = EVAL_NONE;
         } else {
             raw_eval = match tte {
                 Some(e) if e.eval != EVAL_NONE => e.eval,
                 _ => evaluate(pos),
             };
-            eval = raw_eval;
+            static_eval = (raw_eval + self.corr_hist[pos.stm][pidx] / CORR_GRAIN)
+                .clamp(-MATE_BOUND + 1, MATE_BOUND - 1);
+            eval = static_eval;
             if tte.is_some()
                 && tt_score.abs() < MATE_BOUND
                 && ((tt_bound == BOUND_LOWER && tt_score > eval)
@@ -605,10 +625,10 @@ impl Searcher {
                 eval = tt_score;
             }
         }
-        self.stack[ply].eval = raw_eval;
+        self.stack[ply].eval = static_eval;
         let improving = !in_check
             && ply >= 2
-            && (self.stack[ply - 2].eval == EVAL_NONE || raw_eval > self.stack[ply - 2].eval);
+            && (self.stack[ply - 2].eval == EVAL_NONE || static_eval > self.stack[ply - 2].eval);
         self.killers[ply + 1] = [Move::NONE; 2];
 
         if !pv_node && !in_check {
@@ -796,6 +816,18 @@ impl Searcher {
         } else {
             BOUND_UPPER
         };
+        // Correction history: pull static eval towards the search result at quiet nodes.
+        if !in_check
+            && (best_move.is_none() || !best_move.is_tactical())
+            && best_score.abs() < MATE_BOUND
+            && !(bound == BOUND_LOWER && best_score <= static_eval)
+            && !(bound == BOUND_UPPER && best_score >= static_eval)
+        {
+            let diff = (best_score - static_eval) * CORR_GRAIN;
+            let w = (depth + 1).min(16);
+            let c = &mut self.corr_hist[pos.stm][pidx];
+            *c = ((*c * (CORR_GRAIN - w) + diff * w) / CORR_GRAIN).clamp(-CORR_MAX, CORR_MAX);
+        }
         self.tt.store(pos.hash, best_move, score_to_tt(best_score, ply), raw_eval, depth, bound);
         best_score
     }
@@ -843,7 +875,8 @@ impl Searcher {
                 Some(e) if e.eval != EVAL_NONE => e.eval,
                 _ => evaluate(pos),
             };
-            best_score = raw_eval;
+            best_score = (raw_eval + self.corr_hist[pos.stm][pawn_index(pos)] / CORR_GRAIN)
+                .clamp(-MATE_BOUND + 1, MATE_BOUND - 1);
             if best_score >= beta {
                 return best_score;
             }

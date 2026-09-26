@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T09:37:25Z",
+  "updatedAt": "2026-09-26T08:01:55Z",
   "items": [
     {
       "id": "B001",
@@ -48,57 +48,6 @@
             1,
             3,
             5
-          ]
-        }
-      ],
-      "notes": []
-    },
-    {
-      "id": "B005",
-      "title": "Add king-in-centre and pawn-shield king safety",
-      "category": "evaluation",
-      "priority": "high",
-      "status": "open",
-      "count": 1,
-      "agents": [
-        "engine-dev"
-      ],
-      "detail": "**Where:** `engine/src/eval.rs::eval_side` (the king-safety block around the `king_zone` / `KS_UNITS` code) plus castling rights from `Position`.\n**Now:** king safety is only attack units × attacker count on the king zone. Nothing rewards a pawn shield, and nothing punishes a king still on d/e-file that has lost its castling rights or sits on an open file.\n**Change:** (1) MG-only penalty for a king on files c-f with no castling rights left: start at **-40 cp**, plus **-20 cp** per open or half-open file among the king file and its neighbours. (2) Pawn shield: **+12 cp** per own pawn on the 2nd rank and **+6 cp** per pawn on the 3rd rank in front of a castled king (files ±1). (3) Small bonus **+15 cp** MG for keeping any castling right while the king is still on e1/e8.\n**Why:** at plies 5-17 we were consistently 0.4-1.4 pawns below SF (+0.70/+1.14, +1.34/+2.07, +1.32/+2.36, +1.37/+2.64, +2.43/+3.87). At ply 11 we skipped `6.Ng5!` (SF +3.36 vs d4 +2.51). Our own probe after 6.Ng5 gives only +1.68 for the line Bb7 Nxf7 Rg8 Ng5, where Black permanently loses castling. Against stronger Stockfish levels these are exactly the attacking chances we need to take, because a draw is worth nothing.\n**Verify:** FEN `rnb1kb1r/2ppqppp/p4n2/1p2p3/4P3/1BN2N2/PPPP1PPP/R1BQK2R w KQkq - 2 6` → expect `f3g5` (Ng5) within 4 s movetime (currently d4 at d25, 13M nodes). Then SPRT `fastchess ... -each tc=10+0.1 -rounds 5000 -repeat -concurrency 8 -openings file=books/UHO_Lichess_4852_v1.epd format=epd order=random -sprt elo0=0 elo1=5 alpha=0.05 beta=0.05`.\n**Expected:** +15-35 Elo.",
-      "firstSeen": {
-        "matchId": "m_20260925_1320_002",
-        "agent": "engine-dev",
-        "at": "2026-09-25T09:37:25Z",
-        "stockfishElo": 1320,
-        "relatedPlies": [
-          11,
-          15,
-          17
-        ]
-      },
-      "lastSeen": {
-        "matchId": "m_20260925_1320_002",
-        "agent": "engine-dev",
-        "at": "2026-09-25T09:37:25Z",
-        "stockfishElo": 1320,
-        "relatedPlies": [
-          11,
-          15,
-          17
-        ]
-      },
-      "games": [
-        "m_20260925_1320_002"
-      ],
-      "occurrences": [
-        {
-          "matchId": "m_20260925_1320_002",
-          "agent": "engine-dev",
-          "at": "2026-09-25T09:37:25Z",
-          "stockfishElo": 1320,
-          "relatedPlies": [
-            11,
-            15,
-            17
           ]
         }
       ],
@@ -397,6 +346,59 @@
         }
       ],
       "notes": []
+    },
+    {
+      "id": "B005",
+      "title": "Add king-in-centre and pawn-shield king safety",
+      "category": "evaluation",
+      "priority": "high",
+      "status": "rejected",
+      "count": 1,
+      "agents": [
+        "engine-dev"
+      ],
+      "detail": "**Where:** `engine/src/eval.rs::eval_side` (the king-safety block around the `king_zone` / `KS_UNITS` code) plus castling rights from `Position`.\n**Now:** king safety is only attack units × attacker count on the king zone. Nothing rewards a pawn shield, and nothing punishes a king still on d/e-file that has lost its castling rights or sits on an open file.\n**Change:** (1) MG-only penalty for a king on files c-f with no castling rights left: start at **-40 cp**, plus **-20 cp** per open or half-open file among the king file and its neighbours. (2) Pawn shield: **+12 cp** per own pawn on the 2nd rank and **+6 cp** per pawn on the 3rd rank in front of a castled king (files ±1). (3) Small bonus **+15 cp** MG for keeping any castling right while the king is still on e1/e8.\n**Why:** at plies 5-17 we were consistently 0.4-1.4 pawns below SF (+0.70/+1.14, +1.34/+2.07, +1.32/+2.36, +1.37/+2.64, +2.43/+3.87). At ply 11 we skipped `6.Ng5!` (SF +3.36 vs d4 +2.51). Our own probe after 6.Ng5 gives only +1.68 for the line Bb7 Nxf7 Rg8 Ng5, where Black permanently loses castling. Against stronger Stockfish levels these are exactly the attacking chances we need to take, because a draw is worth nothing.\n**Verify:** FEN `rnb1kb1r/2ppqppp/p4n2/1p2p3/4P3/1BN2N2/PPPP1PPP/R1BQK2R w KQkq - 2 6` → expect `f3g5` (Ng5) within 4 s movetime (currently d4 at d25, 13M nodes). Then SPRT `fastchess ... -each tc=10+0.1 -rounds 5000 -repeat -concurrency 8 -openings file=books/UHO_Lichess_4852_v1.epd format=epd order=random -sprt elo0=0 elo1=5 alpha=0.05 beta=0.05`.\n**Expected:** +15-35 Elo.",
+      "firstSeen": {
+        "matchId": "m_20260925_1320_002",
+        "agent": "engine-dev",
+        "at": "2026-09-25T09:37:25Z",
+        "stockfishElo": 1320,
+        "relatedPlies": [
+          11,
+          15,
+          17
+        ]
+      },
+      "lastSeen": {
+        "matchId": "m_20260925_1320_002",
+        "agent": "engine-dev",
+        "at": "2026-09-25T09:37:25Z",
+        "stockfishElo": 1320,
+        "relatedPlies": [
+          11,
+          15,
+          17
+        ]
+      },
+      "games": [
+        "m_20260925_1320_002"
+      ],
+      "occurrences": [
+        {
+          "matchId": "m_20260925_1320_002",
+          "agent": "engine-dev",
+          "at": "2026-09-25T09:37:25Z",
+          "stockfishElo": 1320,
+          "relatedPlies": [
+            11,
+            15,
+            17
+          ]
+        }
+      ],
+      "notes": [
+        "2026-09-26T08:01:55Z rejected: h2h -43 ± 25 Elo (511 g @100ms, SPRT [0,10] reject), reverted"
+      ]
     }
   ]
 }

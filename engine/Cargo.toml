@@ -1,6 +1,6 @@
 [package]
 name = "amazing-chess"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 description = "AmazingChess - our own UCI chess engine (bitboards, alpha-beta, PeSTO eval)"
 authors = ["amazing-chess team"]

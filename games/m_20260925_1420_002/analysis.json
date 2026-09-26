@@ -1,0 +1,477 @@
+{
+  "matchId": "m_20260925_1420_002",
+  "status": "ready",
+  "analyzer": {
+    "engine": "Stockfish 19",
+    "depth": 18
+  },
+  "moves": [
+    {
+      "ply": 1,
+      "evalCp": 20,
+      "mateIn": null,
+      "cpLoss": 17,
+      "classification": "book",
+      "bestMoveUci": "e2e4",
+      "bestMoveSan": "e4"
+    },
+    {
+      "ply": 2,
+      "evalCp": 20,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "book",
+      "bestMoveUci": "d7d5",
+      "bestMoveSan": "d5"
+    },
+    {
+      "ply": 3,
+      "evalCp": 22,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "book",
+      "bestMoveUci": "c2c4",
+      "bestMoveSan": "c4"
+    },
+    {
+      "ply": 4,
+      "evalCp": 58,
+      "mateIn": null,
+      "cpLoss": 36,
+      "classification": "good",
+      "bestMoveUci": "e7e6",
+      "bestMoveSan": "e6"
+    },
+    {
+      "ply": 5,
+      "evalCp": 20,
+      "mateIn": null,
+      "cpLoss": 38,
+      "classification": "good",
+      "bestMoveUci": "c4d5",
+      "bestMoveSan": "cxd5"
+    },
+    {
+      "ply": 6,
+      "evalCp": 25,
+      "mateIn": null,
+      "cpLoss": 5,
+      "classification": "best",
+      "bestMoveUci": "e7e6",
+      "bestMoveSan": "e6"
+    },
+    {
+      "ply": 7,
+      "evalCp": -23,
+      "mateIn": null,
+      "cpLoss": 48,
+      "classification": "good",
+      "bestMoveUci": "b1c3",
+      "bestMoveSan": "Nc3"
+    },
+    {
+      "ply": 8,
+      "evalCp": -18,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "d5c4",
+      "bestMoveSan": "dxc4"
+    },
+    {
+      "ply": 9,
+      "evalCp": -38,
+      "mateIn": null,
+      "cpLoss": 20,
+      "classification": "excellent",
+      "bestMoveUci": "g2g3",
+      "bestMoveSan": "g3"
+    },
+    {
+      "ply": 10,
+      "evalCp": -44,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "b7b5",
+      "bestMoveSan": "b5"
+    },
+    {
+      "ply": 11,
+      "evalCp": -68,
+      "mateIn": null,
+      "cpLoss": 24,
+      "classification": "excellent",
+      "bestMoveUci": "e2e4",
+      "bestMoveSan": "e4"
+    },
+    {
+      "ply": 12,
+      "evalCp": -55,
+      "mateIn": null,
+      "cpLoss": 13,
+      "classification": "excellent",
+      "bestMoveUci": "e7e6",
+      "bestMoveSan": "e6"
+    },
+    {
+      "ply": 13,
+      "evalCp": -447,
+      "mateIn": null,
+      "cpLoss": 392,
+      "classification": "blunder",
+      "bestMoveUci": "b1c3",
+      "bestMoveSan": "Nc3"
+    },
+    {
+      "ply": 14,
+      "evalCp": -388,
+      "mateIn": null,
+      "cpLoss": 59,
+      "classification": "inaccuracy",
+      "bestMoveUci": "e7e5",
+      "bestMoveSan": "e5"
+    },
+    {
+      "ply": 15,
+      "evalCp": -655,
+      "mateIn": null,
+      "cpLoss": 267,
+      "classification": "blunder",
+      "bestMoveUci": "c2b2",
+      "bestMoveSan": "Qb2"
+    },
+    {
+      "ply": 16,
+      "evalCp": -654,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "f6d5",
+      "bestMoveSan": "Nfd5"
+    },
+    {
+      "ply": 17,
+      "evalCp": -750,
+      "mateIn": null,
+      "cpLoss": 96,
+      "classification": "inaccuracy",
+      "bestMoveUci": "c3b2",
+      "bestMoveSan": "Qb2"
+    },
+    {
+      "ply": 18,
+      "evalCp": -710,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "d5f4",
+      "bestMoveSan": "Nxf4"
+    },
+    {
+      "ply": 19,
+      "evalCp": -694,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "a4b5",
+      "bestMoveSan": "axb5"
+    },
+    {
+      "ply": 20,
+      "evalCp": -676,
+      "mateIn": null,
+      "cpLoss": 18,
+      "classification": "excellent",
+      "bestMoveUci": "e7e5",
+      "bestMoveSan": "e5"
+    },
+    {
+      "ply": 21,
+      "evalCp": -638,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "c1f4",
+      "bestMoveSan": "Qxf4"
+    },
+    {
+      "ply": 22,
+      "evalCp": -676,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "b4c2",
+      "bestMoveSan": "Nc2+"
+    },
+    {
+      "ply": 23,
+      "evalCp": -676,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "e1d1",
+      "bestMoveSan": "Kd1"
+    },
+    {
+      "ply": 24,
+      "evalCp": -685,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "c2a1",
+      "bestMoveSan": "Nxa1"
+    },
+    {
+      "ply": 25,
+      "evalCp": -798,
+      "mateIn": null,
+      "cpLoss": 113,
+      "classification": "mistake",
+      "bestMoveUci": "f3e5",
+      "bestMoveSan": "Ne5"
+    },
+    {
+      "ply": 26,
+      "evalCp": -800,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "f7f6",
+      "bestMoveSan": "f6"
+    },
+    {
+      "ply": 27,
+      "evalCp": -809,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "e2e3",
+      "bestMoveSan": "e3"
+    },
+    {
+      "ply": 28,
+      "evalCp": -778,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "b3b2",
+      "bestMoveSan": "b2"
+    },
+    {
+      "ply": 29,
+      "evalCp": -783,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "f1d3",
+      "bestMoveSan": "Bd3"
+    },
+    {
+      "ply": 30,
+      "evalCp": -735,
+      "mateIn": null,
+      "cpLoss": 48,
+      "classification": "good",
+      "bestMoveUci": "g7g6",
+      "bestMoveSan": "g6"
+    },
+    {
+      "ply": 31,
+      "evalCp": -802,
+      "mateIn": null,
+      "cpLoss": 67,
+      "classification": "inaccuracy",
+      "bestMoveUci": "f3e5",
+      "bestMoveSan": "Ne5"
+    },
+    {
+      "ply": 32,
+      "evalCp": -792,
+      "mateIn": null,
+      "cpLoss": 10,
+      "classification": "best",
+      "bestMoveUci": "f7f6",
+      "bestMoveSan": "f6"
+    },
+    {
+      "ply": 33,
+      "evalCp": -808,
+      "mateIn": null,
+      "cpLoss": 16,
+      "classification": "excellent",
+      "bestMoveUci": "d1e2",
+      "bestMoveSan": "Ke2"
+    },
+    {
+      "ply": 34,
+      "evalCp": -767,
+      "mateIn": null,
+      "cpLoss": 41,
+      "classification": "good",
+      "bestMoveUci": "a1c2",
+      "bestMoveSan": "Nc2+"
+    },
+    {
+      "ply": 35,
+      "evalCp": -842,
+      "mateIn": null,
+      "cpLoss": 75,
+      "classification": "inaccuracy",
+      "bestMoveUci": "e1f1",
+      "bestMoveSan": "Kf1"
+    },
+    {
+      "ply": 36,
+      "evalCp": -873,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "e6d5",
+      "bestMoveSan": "Bd5"
+    },
+    {
+      "ply": 37,
+      "evalCp": -923,
+      "mateIn": null,
+      "cpLoss": 50,
+      "classification": "good",
+      "bestMoveUci": "e1f1",
+      "bestMoveSan": "Kf1"
+    },
+    {
+      "ply": 38,
+      "evalCp": -936,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "a4b4",
+      "bestMoveSan": "Qb4"
+    },
+    {
+      "ply": 39,
+      "evalCp": -941,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "g5e4",
+      "bestMoveSan": "Ne4"
+    },
+    {
+      "ply": 40,
+      "evalCp": -956,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "d5e4",
+      "bestMoveSan": "Bxe4"
+    },
+    {
+      "ply": 41,
+      "evalCp": -1545,
+      "mateIn": null,
+      "cpLoss": 544,
+      "classification": "blunder",
+      "bestMoveUci": "d3e4",
+      "bestMoveSan": "Bxe4"
+    },
+    {
+      "ply": 42,
+      "evalCp": -1597,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "b3c1",
+      "bestMoveSan": "Nc1+"
+    },
+    {
+      "ply": 43,
+      "evalCp": null,
+      "mateIn": -6,
+      "cpLoss": 0,
+      "classification": "blunder",
+      "bestMoveUci": "f4h2",
+      "bestMoveSan": "Qh2"
+    },
+    {
+      "ply": 44,
+      "evalCp": null,
+      "mateIn": -5,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "b4c3",
+      "bestMoveSan": "Qxc3"
+    },
+    {
+      "ply": 45,
+      "evalCp": null,
+      "mateIn": -4,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "c2b3",
+      "bestMoveSan": "Bxb3"
+    },
+    {
+      "ply": 46,
+      "evalCp": null,
+      "mateIn": -3,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "a8b8",
+      "bestMoveSan": "Rxb8"
+    },
+    {
+      "ply": 47,
+      "evalCp": null,
+      "mateIn": -2,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "c2b3",
+      "bestMoveSan": "Bxb3"
+    },
+    {
+      "ply": 48,
+      "evalCp": null,
+      "mateIn": -1,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "c3d2",
+      "bestMoveSan": "Qd2+"
+    },
+    {
+      "ply": 49,
+      "evalCp": null,
+      "mateIn": -1,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "e2f1",
+      "bestMoveSan": "Kf1"
+    },
+    {
+      "ply": 50,
+      "evalCp": null,
+      "mateIn": 0,
+      "cpLoss": 0,
+      "classification": "best",
+      "bestMoveUci": "d2d1",
+      "bestMoveSan": "Qd1#"
+    }
+  ],
+  "summary": {
+    "decisivePly": 13,
+    "opening": "D06 Queen's Gambit",
+    "engineAccuracy": 97.2,
+    "stockfishAccuracy": 78.2
+  },
+  "reports": {
+    "gmCoach": {
+      "agent": "gm-coach",
+      "status": "pending"
+    },
+    "engineDev": {
+      "agent": "engine-dev",
+      "status": "pending"
+    }
+  },
+  "createdAt": "2026-09-25T10:20:02Z"
+}
