@@ -69,14 +69,30 @@ Background, rules and strategy: [docs/00-overview.md](docs/00-overview.md).
 - Any saved game can be replayed **from the first move to the last** on a graphical chessboard.
 - The viewer can step forward/back, jump to start/end, jump to any move and autoplay.
 - The replay shows the move list, the players (incl. Stockfish Elo) and the result.
-- The board is staged as an homage to *The Seventh Seal*: a black-and-white, overcast, empty stony
-  beach by the sea with only the two players and the board. Our engine is **the Knight** and
-  Stockfish is **Death**. The default view is from the Knight's side, with Death and the board
-  clearly in front of him.
-- **The two players play the moves:** when a game steps forward (replay, autoplay or live) the moving
-  player reaches out, picks up the piece and sets it down. Captured pieces are placed beside the
-  board, and castling, en passant and promotion are played out.
-- Each move is also given as a subtitle in words (e.g. "Death takes the pawn on e4 with the knight").
+- There are two 3D stages to choose from (the choice is remembered). Both play every move forward
+  (replay, autoplay or live), place captured pieces beside the board, and play out castling,
+  en passant and promotion:
+  - **Expedition** (default): a painterly, golden-hour Belle Époque battlefield, inspired by
+    *Clair Obscur: Expedition 33* but not copied from it. Our engine is **the Expedition** and
+    Stockfish is **the Paintress**. Across the sea is an island city with a broken, curled-over
+    iron tower, and the fractured Monolith on the horizon shows the Stockfish Elo. **Every
+    piece carries a weapon, and every capture is a dramatic duel:** a cinematic camera cut, the
+    strike in slow motion, and the victim dissolving into petals. The inner circle of the plaza,
+    with the board on it, is a slow elevator: it keeps slowly rising while the game goes on,
+    then eases back down and climbs again. Duels can be
+    switched off, and autoplay waits for a duel to finish. A soundtrack (the game's battle
+    themes, via YouTube's player at the bottom of the page) plays while the game plays and pauses
+    with it; it can be switched off. Each match opens with a short, skippable prologue: the
+    Paintress paints a number that no one in Lumière may live beyond, and every Expedition that
+    beats her raises it. The prologue shows how long Lumière's people may now live (the highest
+    Stockfish Elo ever beaten) and the Elo this year's Expedition sails for (this match), then asks
+    "Will this be the year Lumière wins?"
+  - **The Seventh Seal**: an homage in black and white, an overcast, empty stony beach with only the
+    two players and the board. Our engine is **the Knight** and Stockfish is **Death**, seen from the
+    Knight's side. **The two players play the moves**: the mover reaches out, picks up the piece and
+    sets it down.
+- Each move is also given as a subtitle in words (e.g. "Death takes the pawn on e4 with the knight",
+  or on the Expedition stage "The Paintress's rook crushes the pawn on e4").
 - A plain 2D board is always available as an alternative view, and is used when 3D is not supported.
 
 ### 5. Analyse every game
@@ -189,12 +205,26 @@ How to work in parallel: [docs/08-parallel-work.md](docs/08-parallel-work.md).
 - Phase: **1 — qualify end-to-end**, first proof game won, saved, analysed and reviewed by both agents
   (see [roadmap](docs/03-roadmap.md)). Engine v0.2.0 (classical alpha-beta + correction history), backend,
   analysis skill + both agents exist. The frontend now has the *Seventh Seal* replay/live stage; the ladder
-  and stats pages are restyled but not yet redesigned.
+  and stats pages are restyled but not yet redesigned. A second, default stage,
+  *Expedition*, has armed pieces that fight every capture out as a duel.
 - ⏸️ Automatic agent reviews are **paused** (engine analysis still runs). Re-enable before submission.
 
 ---
 
 ## Changelog
+
+- 2026-09-26 — Frontend: *Expedition* stage, a painterly golden-hour battlefield inspired by
+  *Clair Obscur: Expedition 33*, now the default next to the Seventh Seal stage. Pieces are armed
+  warriors (spear, lance, staff, hammer, rapier, greatsword), and every capture is a cinematic duel
+  with slow motion that ends in a petal dissolve. Adds a Duels on/off toggle, battle-style subtitles
+  and a stage toggle. The backdrop has an island city with a bent Eiffel-style tower, a
+  lighthouse, boats, and the Monolith in a frozen rock explosion. The world is alive: wind-blown
+  grass and flowers, swaying CC0 trees (Quaternius), a wave sea with foam and glitter, and birds.
+  The inner circle with the board keeps slowly rising on a gold-banded stone shaft. A soundtrack
+  (YouTube embed, below the analysis) plays with Play and pauses with Pause. A skippable story
+  prologue opens each match, and subtitles sit in the sky clear of the pieces. The Battle camera
+  can be orbited, panned and zoomed freely, and the chosen view is remembered in the browser.
+  No contract change. See [ADR 0006](docs/decisions/0006-expedition-battle-stage.md).
 
 - 2026-09-25 — Paused the automatic GM-coach / engine-dev reviews to save tokens. Engine analysis
   still runs after every game, and new games keep their agent reports `pending` so they can be

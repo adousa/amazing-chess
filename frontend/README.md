@@ -1,7 +1,8 @@
 # frontend/
 
-UI: match list + new-match form, replay/live on the *Seventh Seal* 3D stage (the Knight vs Death
-on a black-and-white beach; the players play each move, see [docs/07-ux.md](../docs/07-ux.md)),
+UI: match list + new-match form, replay/live on one of two 3D stages: *Expedition* (default; a
+painterly battlefield where armed pieces fight every capture out as a duel) or *The Seventh Seal*
+(the Knight vs Death on a black-and-white beach), see [docs/07-ux.md](../docs/07-ux.md),
 analysis and agent reports, Elo ladder and stats. Talks to the backend **only** through
 [`contracts/`](../contracts/). Vite + React + TypeScript, `three` for the stage (`src/scene/`,
 lazy-loaded), `@lichess-org/chessground` for the 2D view, `chess.js` for position checks. API types are generated from `contracts/openapi.yaml`
@@ -25,4 +26,5 @@ npm run dev:mock            # dev server with VITE_API_BASE=http://127.0.0.1:401
 (e.g. `"fenAfter": "string"`), so the board shows an "invalid FEN" note there; that's expected.
 
 Routes (hash-based): `#/matches`, `#/matches/:id` (replay, or live if running), `#/ladder`, `#/stats`.
-Replay keys: ← → Home End. In dev, the stage is on `window.__seal` (e.g. tune `__seal.views.shoulder`).
+Replay keys: ← → Home End. In dev, the stages are on `window.__exp` / `window.__seal` (e.g. tune
+`__exp.views.shoulder`, or set `__exp.debugSpeed = 0.1` to watch a duel in slow motion).
