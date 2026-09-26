@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   api,
   eventsUrl,
@@ -14,25 +14,71 @@ import {
 } from '../api/client';
 import { Board } from '../components/Board';
 import { EvalGraph } from '../components/EvalGraph';
-import { capturedByPly, describeMove, START_FEN } from '../chess';
+import { MusicPlayer } from '../components/MusicPlayer';
+import { capturedByPly, describeMove, START_FEN, type MoveStyle } from '../chess';
 import { fmtDate, fmtEval } from '../util';
 
 // three.js is only downloaded when a match is opened
 const SealStage = lazy(() => import('../components/SealStage').then((m) => ({ default: m.SealStage })));
+const ExpeditionStage = lazy(() => import('../components/ExpeditionStage').then((m) => ({ default: m.ExpeditionStage })));
 
 type ViewMode = 'shoulder' | 'above' | '2d';
+type Theme = 'expedition' | 'seal';
 const VIEW_KEY = 'ac.view';
-const savedView = (): ViewMode => {
+const THEME_KEY = 'ac.theme';
+const DUELS_KEY = 'ac.duels';
+const MUSIC_KEY = 'ac.music';
+/** Soundtrack for the Expedition stage: the official upload, played through YouTube's embed. */
+// (A fan-made compilation of the battle themes; if it is ever taken down, the official upload of
+// "Lumière" is videoId 'zmvsw2ILX5k' on Sandfall Interactive's channel.)
+const MUSIC = { videoId: 'Jgcp7ou9Xbs', title: 'Battle themes', credit: 'Clair Obscur: Expedition 33 OST (music by Lorien Testard) · via YouTube' };
+/** How long each beat of the Expedition prologue is on screen (ms), long enough to read. */
+const BEATS_MS = [7000, 7500, 7000, 7000];
+const BEAT_AT = BEATS_MS.map((_, i) => BEATS_MS.slice(0, i).reduce((a, b) => a + b, 0));
+const LAST_BEAT_AT = BEATS_MS.reduce((a, b) => a + b, 0);
+const PROLOGUE_MS = LAST_BEAT_AT + 4000;
+const load = (k: string) => {
   try {
-    const v = localStorage.getItem(VIEW_KEY);
-    return v === 'above' || v === '2d' ? v : 'shoulder';
+    return localStorage.getItem(k);
   } catch {
-    return 'shoulder';
+    return null;
   }
 };
-const KNIGHT = 'The Knight';
-const DEATH = 'Death';
-const RESULT_LINE: Record<string, string> = { win: 'The Knight has won.', loss: 'Death has won.', draw: 'Neither of them wins. A draw.' };
+const save = (k: string, v: string) => {
+  try {
+    localStorage.setItem(k, v);
+  } catch {
+    /* private mode: not remembered */
+  }
+};
+const savedView = (): ViewMode => {
+  const v = load(VIEW_KEY);
+  return v === 'above' || v === '2d' ? v : 'shoulder';
+};
+
+/** How each stage names the two sides and tells the story. */
+const CAST: Record<Theme, { us: string; them: string; versus: string; result: Record<string, string>; style: MoveStyle; views: Record<ViewMode, string> }> = {
+  seal: {
+    us: 'The Knight',
+    them: 'Death',
+    versus: 'plays chess with',
+    result: { win: 'The Knight has won.', loss: 'Death has won.', draw: 'Neither of them wins. A draw.' },
+    style: 'plain',
+    views: { shoulder: 'Shoulder', above: 'Above', '2d': '2D' },
+  },
+  expedition: {
+    us: 'The Expedition',
+    them: 'The Paintress',
+    versus: 'marches against',
+    result: {
+      win: 'The Paintress falls. The number climbs, and Lumière lives longer.',
+      loss: 'The Paintress paints over the Expedition.',
+      draw: 'Neither side falls. The number stays on the Monolith.',
+    },
+    style: 'battle',
+    views: { shoulder: 'Battle', above: 'Above', '2d': '2D' },
+  },
+};
 const BADGE: Partial<Record<AnalyzedMove['classification'], string>> = {
   brilliant: '!!',
   inaccuracy: '?!',
@@ -55,17 +101,41 @@ export function MatchPage({ id }: { id: string }) {
   const [analysisError, setAnalysisError] = useState<string>();
   const [view, setView] = useState<ViewMode>(savedView);
   const [intro, setIntro] = useState(true);
+  /** Highest Stockfish Elo ever beaten: in the story, how long Lumière's people may now live. */
+  const [lifespan, setLifespan] = useState<number | null>();
   const [stepMs, setStepMs] = useState(1300);
+  const [theme, setTheme] = useState<Theme>(() => (load(THEME_KEY) === 'seal' ? 'seal' : 'expedition'));
+  const [duels, setDuels] = useState(() => load(DUELS_KEY) !== 'off');
+  const [music, setMusic] = useState(() => load(MUSIC_KEY) !== 'off');
+  const [cameraReset, setCameraReset] = useState(0);
+  // autoplay waits for a duel to finish before the next move
+  const busyUntil = useRef(0);
   const chooseView = (v: ViewMode) => {
     setView(v);
-    try {
-      localStorage.setItem(VIEW_KEY, v);
-    } catch {
-      /* private mode: not remembered */
-    }
+    save(VIEW_KEY, v);
+  };
+  const chooseTheme = (t: Theme) => {
+    setTheme(t);
+    save(THEME_KEY, t);
+  };
+  const toggleMusic = () => {
+    setMusic((m) => {
+      save(MUSIC_KEY, m ? 'off' : 'on');
+      return !m;
+    });
+  };
+  const toggleDuels = () => {
+    setDuels((d) => {
+      save(DUELS_KEY, d ? 'off' : 'on');
+      return !d;
+    });
   };
   useEffect(() => {
-    const t = setTimeout(() => setIntro(false), 3800);
+    const t = setTimeout(() => setIntro(false), load(THEME_KEY) === 'seal' ? 3800 : PROLOGUE_MS);
+    api
+      .getLadder()
+      .then((l) => setLifespan(l.highestEloBeaten ?? null))
+      .catch(() => setLifespan(null));
     return () => clearTimeout(t);
   }, [id]);
 
@@ -194,10 +264,11 @@ export function MatchPage({ id }: { id: string }) {
       setAutoplay(false);
       return;
     }
+    const wait = Math.max(speed, busyUntil.current - performance.now() + 250);
     const t = setTimeout(() => {
       setStepMs(Math.min(speed * 0.85, 1600));
       goto(ply + 1);
-    }, speed);
+    }, wait);
     return () => clearTimeout(t);
   }, [autoplay, ply, n, speed, goto]);
 
@@ -226,6 +297,9 @@ export function MatchPage({ id }: { id: string }) {
     const m = moves[p - 1];
     return m ? `${Math.ceil(p / 2)}.${m.color === 'black' ? '..' : ''} ${m.san}` : `ply ${p}`;
   };
+  const cast = CAST[theme];
+  const KNIGHT = cast.us;
+  const DEATH = cast.them;
   const who = (m?: Move) => (m?.by === 'engine' ? KNIGHT : DEATH);
   const active = isActive(match.status);
   const thinkingSide = active && thinking ? (thinking.side as 'engine' | 'stockfish') : null;
@@ -261,17 +335,25 @@ export function MatchPage({ id }: { id: string }) {
       </div>
       {cur && !intro && (
         <div className="subtitle" key={cur.ply}>
-          <div>{describeMove(moves, cur.ply, startFen, who(cur))}</div>
+          <div>{describeMove(moves, cur.ply, startFen, who(cur), cast.style)}</div>
           <div className="sub2">
             {sanAt(cur.ply)}
             {curA && BADGE[curA.classification] && <span className={`cls ${curA.classification}`}> {BADGE[curA.classification]} {curA.classification}</span>}
           </div>
         </div>
       )}
-      {intro && (
+      {intro && theme === 'expedition' && (
+        <Prologue
+          elo={match.stockfishElo}
+          lifespan={lifespan ?? null}
+          date={fmtDate(match.startedAt ?? match.createdAt)}
+          onSkip={() => setIntro(false)}
+        />
+      )}
+      {intro && theme !== 'expedition' && (
         <div className="titlecard">
           <div className="t1">{KNIGHT}</div>
-          <div className="t2">plays chess with</div>
+          <div className="t2">{cast.versus}</div>
           <div className="t1">{DEATH}</div>
           <div className="t3">
             {engineName} against Stockfish at Elo {match.stockfishElo} · {fmtDate(match.startedAt ?? match.createdAt)}
@@ -280,7 +362,7 @@ export function MatchPage({ id }: { id: string }) {
       )}
       {atEnd && !intro && (
         <div className="titlecard ending">
-          <div className="t1">{RESULT_LINE[match.outcome!]}</div>
+          <div className="t1">{cast.result[match.outcome!]}</div>
           <div className="t3">
             {match.result} {match.termination && <>· by {match.termination}</>}
           </div>
@@ -290,7 +372,7 @@ export function MatchPage({ id }: { id: string }) {
   );
 
   return (
-    <div className="match">
+    <div className={`match theme-${theme}`}>
       <div className="match-head">
         <h2>
           {white} <span className="vs">vs</span> {black}
@@ -316,6 +398,26 @@ export function MatchPage({ id }: { id: string }) {
             <div className="board2d">
               <Board fen={fen} lastMoveUci={cur?.uci} orientation={orientation} arrowUci={nextBest} size={520} />
             </div>
+          ) : theme === 'expedition' ? (
+            <Suspense fallback={<div className="stage exp" />}>
+              <ExpeditionStage
+                moves={moves}
+                ply={ply}
+                startFen={startFen}
+                captured={captured[ply] ?? { w: [], b: [] }}
+                ourColor={match.engineColor}
+                view={view}
+                animMs={liveMs}
+                cinematic={duels}
+                cameraReset={cameraReset}
+                monolith={String(match.stockfishElo)}
+                thinking={thinkingSide}
+                onAnimate={(ms) => (busyUntil.current = performance.now() + ms)}
+                onUnsupported={() => chooseView('2d')}
+              >
+                {overlay}
+              </ExpeditionStage>
+            </Suspense>
           ) : (
             <Suspense fallback={<div className="stage" />}>
               <SealStage
@@ -351,10 +453,32 @@ export function MatchPage({ id }: { id: string }) {
             <div className="seg" role="group" aria-label="View">
               {(['shoulder', 'above', '2d'] as const).map((v) => (
                 <button key={v} className={view === v ? 'on' : ''} onClick={() => chooseView(v)}>
-                  {v === 'shoulder' ? 'Shoulder' : v === 'above' ? 'Above' : '2D'}
+                  {cast.views[v]}
                 </button>
               ))}
             </div>
+            <div className="seg" role="group" aria-label="Stage">
+              {(['expedition', 'seal'] as const).map((t) => (
+                <button key={t} className={theme === t ? 'on' : ''} onClick={() => chooseTheme(t)}>
+                  {t === 'expedition' ? 'Expedition' : 'Seventh Seal'}
+                </button>
+              ))}
+            </div>
+            {theme === 'expedition' && view === 'shoulder' && (
+              <button onClick={() => setCameraReset((n) => n + 1)} title="Drag to orbit, right-drag or shift-drag to pan, scroll to zoom. Your view is remembered.">
+                Reset camera
+              </button>
+            )}
+            {theme === 'expedition' && view !== '2d' && (
+              <button className={duels ? 'on' : ''} onClick={toggleDuels} title="Cinematic duel camera and slow motion for captures">
+                Duels {duels ? 'on' : 'off'}
+              </button>
+            )}
+            {theme === 'expedition' && (
+              <button className={music ? 'on' : ''} onClick={toggleMusic} title="Play the soundtrack while the game plays">
+                Music {music ? 'on' : 'off'}
+              </button>
+            )}
             {view === '2d' && <button onClick={() => setFlipped((f) => !f)}>Flip</button>}
           </div>
         </div>
@@ -388,7 +512,10 @@ export function MatchPage({ id }: { id: string }) {
               {thinking.thinking.pv?.length ? ` · pv ${thinking.thinking.pv.slice(0, 6).join(' ')}` : ''}
             </div>
           )}
-          <p className="muted small">← → step · Home / End · the players play each move forward.</p>
+          <p className="muted small">
+            ← → step · Home / End ·{' '}
+            {theme === 'expedition' ? 'every capture is fought out as a duel. Drag the stage to orbit, right-drag to pan, scroll to zoom.' : 'the players play each move forward.'}
+          </p>
         </div>
       </div>
 
@@ -401,6 +528,12 @@ export function MatchPage({ id }: { id: string }) {
         onJump={(p) => step(p, 0)}
         onRerun={() => api.rerunAnalysis(match.id).then(setAnalysis).catch((e: Error) => alert(e.message))}
       />
+      {theme === 'expedition' && music && (
+        <section className="soundtrack">
+          <h3>Soundtrack</h3>
+          <MusicPlayer {...MUSIC} playing={autoplay || (live && follow && active)} />
+        </section>
+      )}
     </div>
   );
 }
@@ -579,6 +712,62 @@ function Report({
           </ul>
         </>
       )}
+    </div>
+  );
+}
+
+/**
+ * The Expedition prologue: five beats before the game begins, in our own words. The Paintress's
+ * number is a limit on how long Lumière's people ("petals") may live; every Expedition that beats
+ * her raises it. The limit shown is the highest Stockfish Elo ever beaten; this year's Expedition
+ * sails for the Elo of this match.
+ */
+function Prologue({ elo, lifespan, date, onSkip }: { elo: number; lifespan: number | null; date: string; onSkip: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') onSkip();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onSkip]);
+  const beat = (i: number) => ({ animationDelay: `${BEAT_AT[i]}ms`, animationDuration: `${BEATS_MS[i]}ms` });
+  return (
+    <div className="prologue" onClick={onSkip} role="dialog" aria-label="Prologue">
+      <div className="beat" style={beat(0)}>
+        <p className="kicker">Lumière</p>
+        <p className="line">Once every year, the Paintress wakes and paints a number on her Monolith.</p>
+        <p className="line dim">No petal of Lumière may live a year beyond it.</p>
+      </div>
+      <div className="beat" style={beat(1)}>
+        <p className="line">But whenever an Expedition beats her, the number climbs, and every petal lives a little longer.</p>
+      </div>
+      <div className="beat" style={beat(2)}>
+        {lifespan ? (
+          <>
+            <p className="kicker">Thanks to those who sailed before</p>
+            <p className="line">the petals of Lumière may now live</p>
+            <p className="number">{lifespan}</p>
+            <p className="line dim">years.</p>
+          </>
+        ) : (
+          <>
+            <p className="kicker">Every Expedition so far</p>
+            <p className="line">has fallen. The number has never moved.</p>
+          </>
+        )}
+      </div>
+      <div className="beat" style={beat(3)}>
+        <p className="kicker">This year the Expedition sails for</p>
+        <p className="number small">{elo}</p>
+        <p className="line">Ivory and gold, spear and rapier, and a mind of their own making.</p>
+      </div>
+      <div className="beat last" style={{ animationDelay: `${LAST_BEAT_AT}ms` }}>
+        <p className="question">Will this be the year Lumière wins?</p>
+        <p className="kicker">The board is set · {date}</p>
+      </div>
+      <button className="skip" onClick={onSkip}>
+        Skip ›
+      </button>
     </div>
   );
 }

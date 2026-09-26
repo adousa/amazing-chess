@@ -30,13 +30,29 @@ export function capturedByPly(moves: Move[], startFen: string): Captured[] {
   return out;
 }
 
-/** A spoken-style subtitle: "Death takes the pawn on e4 with the knight. Check." */
-export function describeMove(moves: Move[], ply: number, startFen: string, who: string): string {
+export type MoveStyle = 'plain' | 'battle';
+const STRIKE: Record<string, string> = { p: 'spears', n: 'rides down', b: 'smites', r: 'crushes', q: 'runs through', k: 'cleaves' };
+const GO: Record<string, string> = { p: 'advances to', n: 'leaps to', b: 'glides to', r: 'marches to', q: 'dashes to', k: 'steps to' };
+
+/**
+ * A spoken-style subtitle: "Death takes the pawn on e4 with the knight. Check." In the
+ * battle style: "The Paintress's rook crushes the pawn on e4. Check."
+ */
+export function describeMove(moves: Move[], ply: number, startFen: string, who: string, style: MoveStyle = 'plain'): string {
   const m = moves[ply - 1];
   if (!m) return '';
   const mv = play(fenBefore(moves, ply, startFen), m.uci);
   if (!mv) return `${who} plays ${m.san}.`;
   let s: string;
+  const whose = `${who}${who.endsWith('s') ? "'" : "'s"}`;
+  if (style === 'battle') {
+    if (mv.flags.includes('k') || mv.flags.includes('q'))
+      s = `${whose} king shelters behind the rook on the ${mv.flags.includes('k') ? "king's" : "queen's"} side`;
+    else if (mv.captured) s = `${whose} ${NAME[mv.piece]} ${STRIKE[mv.piece]} the ${NAME[mv.captured]} on ${mv.flags.includes('e') ? mv.to[0] + mv.from[1] : mv.to}`;
+    else s = `${whose} ${NAME[mv.piece]} ${GO[mv.piece]} ${mv.to}`;
+    if (mv.promotion) s += `, and rises as a ${NAME[mv.promotion]}`;
+    return s + (m.san.includes('#') ? '. Checkmate. The king falls.' : m.san.includes('+') ? '. Check.' : '.');
+  }
   if (mv.flags.includes('k')) s = `${who} castles on the king's side`;
   else if (mv.flags.includes('q')) s = `${who} castles on the queen's side`;
   else if (mv.captured) s = `${who} takes the ${NAME[mv.captured]} on ${mv.to} with the ${NAME[mv.piece]}`;

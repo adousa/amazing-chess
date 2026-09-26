@@ -9,3 +9,4 @@ Also record organiser answers to rule questions here.
 | [0002](0002-own-alpha-beta-engine.md) | Our own alpha-beta engine in a compiled language, NNUE later | Proposed |
 | [0003](0003-stockfish-online-for-testing-only.md) | stockfish.online for testing only, local Stockfish for official games | Accepted |
 | [0004](0004-seventh-seal-3d-stage.md) | Replay/live view is a procedural 3D *Seventh Seal* stage (three.js) with a 2D fallback | Accepted |
+| [0005](0005-expedition-battle-stage.md) | Second stage: painterly *Expedition* battlefield, armed pieces, every capture a duel | Accepted |

@@ -14,10 +14,12 @@
     "typecheck": "npm run gen:api && tsc -p ."
   },
   "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.3.0",
     "@fontsource/eb-garamond": "^5.3.0",
     "@fontsource/im-fell-english": "^5.3.0",
     "@lichess-org/chessground": "^10.2.0",
     "chess.js": "^1.4.0",
+    "postprocessing": "^6.39.5",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "three": "^0.186.1"
