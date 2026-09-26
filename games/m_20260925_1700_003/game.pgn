@@ -1,0 +1,43 @@
+[Event "Amazing Chess vs Stockfish"]
+[Site "local"]
+[Date "2026.09.25"]
+[Round "-"]
+[White "AmazingChess 0.1.0"]
+[Black "Stockfish 19 (Elo 1700)"]
+[Result "1-0"]
+[StockfishElo "1700"]
+[BlackElo "1700"]
+[EngineColor "white"]
+[EngineVersion "0.1.0"]
+[StockfishVersion "Stockfish 19"]
+[StockfishSettings "UCI_LimitStrength=true UCI_Elo=1700 Threads=1 Hash=64"]
+[TimeControl "5s/move"]
+[MoveTime "5000"]
+[Termination "checkmate"]
+[MatchId "m_20260925_1700_003"]
+[UTCDate "2026.09.25"]
+[UTCTime "10:22:14"]
+
+1. e4 { [%emt 0:00:02.71] } 1... d5 { [%emt 0:00:04.90] } 2. exd5
+{ [%emt 0:00:02.78] } 2... Nf6 { [%emt 0:00:04.90] } 3. Nf3
+{ [%emt 0:00:03.01] } 3... Nxd5 { [%emt 0:00:04.90] } 4. d4
+{ [%emt 0:00:02.96] } 4... Bf5 { [%emt 0:00:04.90] } 5. Bd3
+{ [%emt 0:00:02.39] } 5... Bxd3 { [%emt 0:00:04.90] } 6. Qxd3
+{ [%emt 0:00:02.69] } 6... c6 { [%emt 0:00:04.90] } 7. c4 { [%emt 0:00:03.03] }
+7... Nb4 { [%emt 0:00:04.90] } 8. Qe2 { [%emt 0:00:03.14] } 8... Nd7
+{ [%emt 0:00:04.90] } 9. O-O { [%emt 0:00:02.71] } 9... g6
+{ [%emt 0:00:04.90] } 10. Re1 { [%emt 0:00:03.33] } 10... Bg7
+{ [%emt 0:00:04.90] } 11. Bg5 { [%emt 0:00:03.13] } 11... Bf8
+{ [%emt 0:00:04.90] } 12. Nc3 { [%emt 0:00:04.83] } 12... Nb6
+{ [%emt 0:00:04.98] } 13. a3 { [%emt 0:00:02.92] } 13... Na6
+{ [%emt 0:00:04.96] } 14. c5 { [%emt 0:00:02.95] } 14... Nd7
+{ [%emt 0:00:04.93] } 15. Ne4 { [%emt 0:00:02.58] } 15... Bg7
+{ [%emt 0:00:04.95] } 16. Nd6+ { [%emt 0:00:03.22] } 16... Kf8
+{ [%emt 0:00:04.94] } 17. Bxe7+ { [%emt 0:00:04.00] } 17... Kg8
+{ [%emt 0:00:04.96] } 18. Bxd8 { [%emt 0:00:04.66] } 18... Ne5
+{ [%emt 0:00:04.95] } 19. Nxe5 { [%emt 0:00:03.36] } 19... Bxe5
+{ [%emt 0:00:04.90] } 20. Qxe5 { [%emt 0:00:00.01] } 20... h5
+{ [%emt 0:00:03.12] } 21. Qe8+ { [%emt 0:00:00.01] } 21... Kh7
+{ [%emt 0:00:00.11] } 22. Qxf7+ { [%emt 0:00:00.00] } 22... Kh6
+{ [%emt 0:00:00.06] } 23. Nf5+ { [%emt 0:00:00.00] } 23... gxf5
+{ [%emt 0:00:00.06] } 24. Re6# { [%emt 0:00:00.01] } 1-0

@@ -44,7 +44,7 @@ Python ≥ 3.9. Our engine is `engine/target/release/amazing-chess` (`cargo buil
 | `AC_ENGINE_OPTIONS` | – | Extra UCI options for our engine as JSON, e.g. `{"Threads": 1}` (only advertised options are set; recorded in `engine.options`) |
 | `AC_ANALYSIS_DEPTH` | `18` | Full-strength Stockfish depth for the per-ply analysis |
 | `AC_ANALYSIS_THREADS` / `AC_ANALYSIS_HASH_MB` | `1` / `128` | Analysis Stockfish settings |
-| `AC_AGENTS` | `1` | `1` = run the Claude agents after the engine analysis (`0` in tests) |
+| `AC_AGENTS` | `0` | `1` = run the Claude agents after the engine analysis. **Off by default for now** (token cost); with `0` the reports stay `pending` and can be backfilled later |
 | `AC_AGENTS_PARALLEL` / `AC_AGENTS_TIMEOUT_S` | `1` / `1800` | Concurrent `claude` runs (global, across processes) / kill after |
 | `AC_CLAUDE_PATH` | `claude` on PATH | Claude Code CLI command |
 

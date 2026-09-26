@@ -1,0 +1,22 @@
+[Event "Amazing Chess vs Stockfish"]
+[Site "local"]
+[Date "2026.09.25"]
+[Round "-"]
+[White "AmazingChess 0.1.0"]
+[Black "Stockfish 19 (Elo 2600)"]
+[Result "1-0"]
+[StockfishElo "2600"]
+[BlackElo "2600"]
+[EngineColor "white"]
+[EngineVersion "0.1.0"]
+[StockfishVersion "Stockfish 19"]
+[StockfishSettings "UCI_LimitStrength=true UCI_Elo=2600 Threads=1 Hash=64"]
+[TimeControl "5s/move"]
+[MoveTime "5000"]
+[Termination "time-limit-exceeded"]
+[MatchId "m_20260925_2600_003"]
+[UTCDate "2026.09.25"]
+[UTCTime "17:51:16"]
+
+1. e4 { [%emt 0:00:02.48] } 1... e5 { [%emt 0:00:04.90] } 2. Nf3
+{ [%emt 0:00:04.75] } 1-0

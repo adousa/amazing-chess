@@ -1,4 +1,4 @@
-# 0005 · A second stage: the painterly "Expedition" battlefield, with armed pieces and duels
+# 0006 · A second stage: the painterly "Expedition" battlefield, with armed pieces and duels
 
 **Status:** Accepted · 2026-09-26
 

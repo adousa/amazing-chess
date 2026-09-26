@@ -1,0 +1,133 @@
+{
+  "id": "m_20260925_2600_003",
+  "status": "finished",
+  "stockfishElo": 2600,
+  "engineColor": "white",
+  "engineVersion": "0.1.0",
+  "result": "1-0",
+  "outcome": "win",
+  "termination": "time-limit-exceeded",
+  "plyCount": 3,
+  "createdAt": "2026-09-25T17:51:16Z",
+  "startedAt": "2026-09-25T17:51:16Z",
+  "finishedAt": "2026-09-25T17:51:33Z",
+  "analysisStatus": "pending",
+  "stockfish": {
+    "version": "Stockfish 19",
+    "elo": 2600,
+    "limitStrength": true,
+    "moveTimeMs": 5000,
+    "threads": 1,
+    "hashMb": 64
+  },
+  "engine": {
+    "name": "AmazingChess",
+    "version": "0.1.0",
+    "color": "white",
+    "moveTimeMs": 5000,
+    "options": {
+      "Hash": 64
+    }
+  },
+  "startFen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+  "moves": [
+    {
+      "ply": 1,
+      "color": "white",
+      "by": "engine",
+      "san": "e4",
+      "uci": "e2e4",
+      "fenAfter": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+      "timeMs": 2484,
+      "thinking": {
+        "scoreCp": 22,
+        "mateIn": null,
+        "depth": 23,
+        "seldepth": 33,
+        "nodes": 6150884,
+        "nps": 2477198,
+        "pv": [
+          "e2e4",
+          "e7e5",
+          "g1f3",
+          "b8c6",
+          "d2d4",
+          "e5d4",
+          "f3d4",
+          "g8f6",
+          "d4c6",
+          "d7c6",
+          "d1d8",
+          "e8d8",
+          "b1c3",
+          "f8d6",
+          "c1e3",
+          "c8e6",
+          "a1d1",
+          "d8e7",
+          "f1e2",
+          "h8e8",
+          "e1g1",
+          "a8d8",
+          "e3a7",
+          "d6f4"
+        ]
+      }
+    },
+    {
+      "ply": 2,
+      "color": "black",
+      "by": "stockfish",
+      "san": "e5",
+      "uci": "e7e5",
+      "fenAfter": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+      "timeMs": 4900
+    },
+    {
+      "ply": 3,
+      "color": "white",
+      "by": "engine",
+      "san": "Nf3",
+      "uci": "g1f3",
+      "fenAfter": "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2",
+      "timeMs": 4751,
+      "thinking": {
+        "scoreCp": 20,
+        "mateIn": null,
+        "depth": 25,
+        "seldepth": 35,
+        "nodes": 5421602,
+        "nps": 2527553,
+        "pv": [
+          "g1f3",
+          "b8c6",
+          "d2d4",
+          "e5d4",
+          "f3d4",
+          "g8f6",
+          "b1c3",
+          "f8b4",
+          "d4c6",
+          "b7c6",
+          "e4e5",
+          "b4c3",
+          "b2c3",
+          "d8e7",
+          "d1e2",
+          "f6d5",
+          "c1d2",
+          "a8b8",
+          "c3c4",
+          "d5b4",
+          "d2c3",
+          "d7d5",
+          "c4d5",
+          "b4d5",
+          "c3d4",
+          "c8f5"
+        ]
+      }
+    }
+  ],
+  "pgnUrl": "/matches/m_20260925_2600_003/pgn"
+}

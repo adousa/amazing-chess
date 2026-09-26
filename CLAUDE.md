@@ -30,6 +30,11 @@ Build a chess application with **our own computer chess player** that defeats **
 **highest possible Elo**. The team that proves a win against the highest configured Stockfish Elo
 wins the competition. A second prize goes to the best overall playing / replay experience.
 
+> **Scoring update (2026-09-26, from the organisers):** most teams reached the maximum Elo, so the
+> winner is decided by **wins out of 10 games** against Stockfish at the top level (3190). Draws score
+> nothing, so our engine plays for the win (raised contempt). The organisers confirmed that colour
+> doesn't matter (we measure both) and that our engine may use more CPU (several search threads).
+
 Background, rules and strategy: [docs/00-overview.md](docs/00-overview.md).
 
 ---
@@ -48,7 +53,8 @@ Background, rules and strategy: [docs/00-overview.md](docs/00-overview.md).
 
 ### 2. Decide and record the outcome
 - Outcome is recorded **from our engine's point of view**: `win`, `draw` or `loss`.
-- **A draw is not a win.** A Stockfish Elo level only counts as beaten after an actual win.
+- **A draw is not a win.** A Stockfish Elo level only counts as beaten after an actual win on the
+  board. A time forfeit caused by our own test setup doesn't count (see `docs/decisions/0005`).
 - Once a level is beaten, the next attempt can use a higher Elo.
 
 ### 3. Save every game (evidence)
@@ -98,6 +104,10 @@ Background, rules and strategy: [docs/00-overview.md](docs/00-overview.md).
   - **Engine developer** — a chess-engine specialist: maps weaknesses to engine causes
     (search, evaluation, time use, …).
 - Both agents must produce **concrete, actionable improvement suggestions** for our engine.
+- ⏸️ **Temporarily disabled (2026-09-25):** the two agents do not run automatically, to save
+  tokens. The engine analysis (per-move evals, mistakes/blunders) still runs after every game. Agent
+  reports stay `pending` until they are re-enabled and backfilled. **They must be re-enabled and
+  backfilled for every game before the final submission.**
 - Analysis and agent reports are saved with the game and viewable in the app.
 
 ### 6. Show progress and results
@@ -188,12 +198,16 @@ How to work in parallel: [docs/08-parallel-work.md](docs/08-parallel-work.md).
 
 ## 📈 Current status
 
-- Highest Stockfish Elo beaten: **1320** — proof game `m_20260925_1320_002` (engine White, 1-0 checkmate, 33 plies)
+- Highest Stockfish Elo beaten: **3190** (the maximum) — proof game `m_20260926_3190_005` (engine v0.2.0 White, 1-0 checkmate, 131 plies, Contempt 60)
+- Wins out of 10 at 3190 (competition scoring), engine v0.2.0, Contempt 60:
+  1 thread: 1 W / 0 D / 5 L (6 games; the restart interrupted 4). 3 threads: 0 W / 3 D / 7 L over 10
+  (White 0/3/2, Black 0/0/5). The losses are decided in the middlegame (plies 36–62). A stronger evaluation (own NNUE) is the next step.
 - Phase: **1 — qualify end-to-end**, first proof game won, saved, analysed and reviewed by both agents
-  (see [roadmap](docs/03-roadmap.md)). Engine v0.1.0 (classical alpha-beta), backend, analysis
-  skill + both agents exist. The frontend now has the *Seventh Seal* replay/live stage; the ladder
-  and stats pages are restyled but not yet redesigned. A second, default stage, *Expedition*, has armed
-  pieces that fight every capture out as a duel.
+  (see [roadmap](docs/03-roadmap.md)). Engine v0.2.0 (classical alpha-beta + correction history), backend,
+  analysis skill + both agents exist. The frontend now has the *Seventh Seal* replay/live stage; the ladder
+  and stats pages are restyled but not yet redesigned. A second, default stage,
+  *Expedition*, has armed pieces that fight every capture out as a duel.
+- ⏸️ Automatic agent reviews are **paused** (engine analysis still runs). Re-enable before submission.
 
 ---
 
@@ -210,13 +224,29 @@ How to work in parallel: [docs/08-parallel-work.md](docs/08-parallel-work.md).
   (YouTube embed, below the analysis) plays with Play and pauses with Pause. A skippable story
   prologue opens each match, and subtitles sit in the sky clear of the pieces. The Battle camera
   can be orbited, panned and zoomed freely, and the chosen view is remembered in the browser.
-  No contract change. See [ADR 0005](docs/decisions/0005-expedition-battle-stage.md).
+  No contract change. See [ADR 0006](docs/decisions/0006-expedition-battle-stage.md).
 
+- 2026-09-25 — Paused the automatic GM-coach / engine-dev reviews to save tokens. Engine analysis
+  still runs after every game, and new games keep their agent reports `pending` so they can be
+  backfilled later.
 - 2026-09-25 — Frontend: *Seventh Seal* stage for replay/live. Black-and-white 3D beach, the Knight
   (our engine) vs Death (Stockfish), and both players physically play each move. Also move
   subtitles, title/ending cards, Shoulder/Above/2D views, and a period black-and-white style across
   the app. No contract change. See [ADR 0004](docs/decisions/0004-seventh-seal-3d-stage.md).
 <!-- Newest first. One line per change: date — what changed (PR/commit). -->
+- 2026-09-26 — Our engine may use several search threads (organisers); the 3190 measurement runs with
+  3 threads and 3 games in parallel, a load that keeps the laptop responsive.
+- 2026-09-26 — **Stockfish Elo 3190 (max) beaten**: `m_20260926_3190_005`, engine v0.2.0, White, checkmate.
+- 2026-09-26 — Competition scoring changed to wins out of 10 games at Stockfish 3190 (mission note).
+- 2026-09-26 — Engine v0.2.0: pawn-structure correction history (h2h vs v0.1.0: +24.4 ± 19.9 Elo,
+  800 games @100 ms). King-safety shelter term (B005) rejected: −43 ± 25 Elo, reverted.
+- 2026-09-26 — Stockfish Elo 2600 beaten 4/4 by checkmate, engine v0.1.0 (proof `m_20260926_2600_001`).
+- 2026-09-26 — Movetime safety margin 100 → 250 ms for both sides. The 4 time-forfeit wins at 2600
+  are artifacts of CPU contention and are not claimed (ADR 0005). A level counts only after an on-board win.
+- 2026-09-25 — Stockfish Elo 2300 beaten 4/4 by engine v0.1.0 (proof `m_20260925_2300_003`).
+- 2026-09-25 — Stockfish Elo 2000 beaten 4/4 by engine v0.1.0 (proof `m_20260925_2000_003`).
+- 2026-09-25 — Stockfish Elo 1700 beaten 4/4 by engine v0.1.0 (proof `m_20260925_1700_001`).
+- 2026-09-25 — Stockfish Elo 1420 beaten 4/4 by engine v0.1.0 (proof `m_20260925_1420_002`).
 - 2026-09-25 — Phase 1 build: engine v0.1.0 (Rust, UCI, perft-verified, never exceeds 5 s),
   backend (match runner vs limited Stockfish, append-only game store, analysis after every game,
   API + SSE per contract v0.1.0), `/analyze-game` skill + `gm-coach` / `engine-dev` agents,
