@@ -4,7 +4,8 @@
       [--games 200] [--movetime 100] [--concurrency 4] [--sprt 0,10] [--pgn out.pgn]
 
 A cheap stand-in for fastchess/cutechess SPRT when those aren't installed. Each opening from a
-small built-in balanced set is played twice with colours swapped. Stops early when the SPRT
+small built-in balanced set (plus --random-plies seeded random plies, default 2) is played
+twice with colours swapped. Stops early when the SPRT
 (trinomial approximation, alpha = beta = 0.05, bounds elo0,elo1) accepts H0 or H1.
 Prints W/D/L from NEW's point of view, score, Elo ± 95% error, LLR, and a verdict line:
   VERDICT: accept | reject | inconclusive
@@ -16,6 +17,7 @@ from __future__ import annotations
 import argparse
 import concurrent.futures as cf
 import math
+import random
 import sys
 import threading
 
@@ -44,14 +46,27 @@ OPENINGS = [
 ]
 
 
-def play_game(new: str, prev: str, opening: str, new_white: bool, movetime: float, max_plies: int):
+def opening_board(opening: str, seed: int, random_plies: int) -> chess.Board:
+    """Book line + `random_plies` seeded random legal plies, so repeated openings differ.
+    Both games of a pair get the same seed (same position, colours swapped)."""
     board = chess.Board()
     for uci in opening.split():
         board.push_uci(uci)
+    rng = random.Random(seed)
+    for _ in range(random_plies):
+        moves = sorted(board.legal_moves, key=lambda m: m.uci())
+        if not moves:
+            break
+        board.push(rng.choice(moves))
+    return board
+
+
+def play_game(new: str, prev: str, start: chess.Board, new_white: bool, movetime: float, max_plies: int):
+    board = start.copy()
     engines = {}
     try:
-        engines[True] = chess.engine.SimpleEngine.popen_uci(new if new_white else prev)
-        engines[False] = chess.engine.SimpleEngine.popen_uci(prev if new_white else new)
+        engines[True] = chess.engine.SimpleEngine.popen_uci(new if new_white else prev, timeout=60)
+        engines[False] = chess.engine.SimpleEngine.popen_uci(prev if new_white else new, timeout=60)
         while not board.is_game_over(claim_draw=True) and board.ply() < max_plies:
             result = engines[board.turn].play(board, chess.engine.Limit(time=movetime))
             if result.move is None or result.move not in board.legal_moves:
@@ -103,6 +118,8 @@ def main() -> int:
     p.add_argument("--concurrency", type=int, default=4)
     p.add_argument("--max-plies", type=int, default=300)
     p.add_argument("--sprt", default="0,10", help="elo0,elo1 (default 0,10)")
+    p.add_argument("--random-plies", type=int, default=2,
+                   help="seeded random plies after each book line (varies repeated openings)")
     p.add_argument("--pgn", help="write the test games to this PGN file (never into games/)")
     args = p.parse_args()
     elo0, elo1 = (float(x) for x in args.sprt.split(","))
@@ -111,7 +128,7 @@ def main() -> int:
     jobs = []
     for i in range((args.games + 1) // 2):
         op = OPENINGS[i % len(OPENINGS)]
-        jobs += [(op, True), (op, False)]
+        jobs += [(op, i, True), (op, i, False)]
 
     w = d = l = 0
     lock = threading.Lock()
@@ -120,9 +137,17 @@ def main() -> int:
     verdict = "inconclusive"
 
     def run(job):
-        if stop.is_set():
-            return None
-        return job, play_game(args.new, args.prev, job[0], job[1], args.movetime / 1000, args.max_plies)
+        op, seed, new_white = job
+        start = opening_board(op, seed, args.random_plies)
+        for _attempt in range(3):  # engine start-up can time out under heavy load: retry, don't die
+            if stop.is_set():
+                return None
+            try:
+                return (op, new_white), play_game(args.new, args.prev, start, new_white,
+                                                  args.movetime / 1000, args.max_plies)
+            except Exception as exc:  # noqa: BLE001
+                print(f"! retrying game ({op}, seed {seed}): {type(exc).__name__}: {exc}", file=sys.stderr)
+        return None
 
     with cf.ThreadPoolExecutor(max_workers=args.concurrency) as pool:
         futures = [pool.submit(run, j) for j in jobs]

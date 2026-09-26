@@ -1,0 +1,88 @@
+{
+  "id": "m_20260925_2600_004",
+  "status": "finished",
+  "stockfishElo": 2600,
+  "engineColor": "black",
+  "engineVersion": "0.1.0",
+  "result": "0-1",
+  "outcome": "win",
+  "termination": "time-limit-exceeded",
+  "plyCount": 2,
+  "createdAt": "2026-09-25T17:51:16Z",
+  "startedAt": "2026-09-25T17:51:16Z",
+  "finishedAt": "2026-09-25T17:51:31Z",
+  "analysisStatus": "pending",
+  "stockfish": {
+    "version": "Stockfish 19",
+    "elo": 2600,
+    "limitStrength": true,
+    "moveTimeMs": 5000,
+    "threads": 1,
+    "hashMb": 64
+  },
+  "engine": {
+    "name": "AmazingChess",
+    "version": "0.1.0",
+    "color": "black",
+    "moveTimeMs": 5000,
+    "options": {
+      "Hash": 64
+    }
+  },
+  "startFen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+  "moves": [
+    {
+      "ply": 1,
+      "color": "white",
+      "by": "stockfish",
+      "san": "Nf3",
+      "uci": "g1f3",
+      "fenAfter": "rnbqkbnr/pppppppp/8/8/8/5N2/PPPPPPPP/RNBQKB1R b KQkq - 1 1",
+      "timeMs": 4901
+    },
+    {
+      "ply": 2,
+      "color": "black",
+      "by": "engine",
+      "san": "d5",
+      "uci": "d7d5",
+      "fenAfter": "rnbqkbnr/ppp1pppp/8/3p4/8/5N2/PPPPPPPP/RNBQKB1R w KQkq - 0 2",
+      "timeMs": 4114,
+      "thinking": {
+        "scoreCp": -3,
+        "mateIn": null,
+        "depth": 24,
+        "seldepth": 36,
+        "nodes": 10437360,
+        "nps": 2537651,
+        "pv": [
+          "d7d5",
+          "d2d4",
+          "c8f5",
+          "e2e3",
+          "b8c6",
+          "f1d3",
+          "e7e6",
+          "d3f5",
+          "e6f5",
+          "b1c3",
+          "g8f6",
+          "d1d3",
+          "g7g6",
+          "e1g1",
+          "a7a6",
+          "f3e5",
+          "f8g7",
+          "e5c6",
+          "b7c6",
+          "b2b3",
+          "e8g8",
+          "c1a3",
+          "f8e8",
+          "a1e1"
+        ]
+      }
+    }
+  ],
+  "pgnUrl": "/matches/m_20260925_2600_004/pgn"
+}

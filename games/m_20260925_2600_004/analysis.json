@@ -1,0 +1,45 @@
+{
+  "matchId": "m_20260925_2600_004",
+  "status": "ready",
+  "analyzer": {
+    "engine": "Stockfish 19",
+    "depth": 18
+  },
+  "moves": [
+    {
+      "ply": 1,
+      "evalCp": 24,
+      "mateIn": null,
+      "cpLoss": 13,
+      "classification": "book",
+      "bestMoveUci": "e2e4",
+      "bestMoveSan": "e4"
+    },
+    {
+      "ply": 2,
+      "evalCp": 24,
+      "mateIn": null,
+      "cpLoss": 0,
+      "classification": "book",
+      "bestMoveUci": "d7d5",
+      "bestMoveSan": "d5"
+    }
+  ],
+  "summary": {
+    "decisivePly": 1,
+    "opening": "A06 Reti Opening",
+    "engineAccuracy": 100.0,
+    "stockfishAccuracy": 95.8
+  },
+  "reports": {
+    "gmCoach": {
+      "agent": "gm-coach",
+      "status": "pending"
+    },
+    "engineDev": {
+      "agent": "engine-dev",
+      "status": "pending"
+    }
+  },
+  "createdAt": "2026-09-25T17:51:49Z"
+}

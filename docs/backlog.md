@@ -11,18 +11,18 @@
 > engine version and marks it `done` or `rejected` with
 > `python scripts/backlog.py set-status <id> <status> --note "…"`.
 
-_Last updated: 2026-09-25T09:37:25Z · 8 item(s)_
+_Last updated: 2026-09-26T08:01:55Z · 8 item(s)_
 
 | # | ID | Title | Category | Priority | Times | Status | First seen | Last seen | Games |
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | B001 | Add an opening book for instant moves | opening | high | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
-| 2 | B005 | Add king-in-centre and pawn-shield king safety | evaluation | high | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
-| 3 | B002 | Reward attacks on f7/f2 against uncastled king | middlegame | medium | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
-| 4 | B003 | Penalise early queen trades when not clearly winning | other | medium | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
-| 5 | B006 | Texel-tune evaluation weights on quiet positions | evaluation | medium | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
-| 6 | B007 | Skip iterations predicted to overrun the hard limit | time-management | medium | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
-| 7 | B004 | Spend saved time on critical middlegame moves | other | low | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
-| 8 | B008 | Add a small opening book | other | low | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
+| 2 | B002 | Reward attacks on f7/f2 against uncastled king | middlegame | medium | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
+| 3 | B003 | Penalise early queen trades when not clearly winning | other | medium | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
+| 4 | B006 | Texel-tune evaluation weights on quiet positions | evaluation | medium | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
+| 5 | B007 | Skip iterations predicted to overrun the hard limit | time-management | medium | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
+| 6 | B004 | Spend saved time on critical middlegame moves | other | low | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
+| 7 | B008 | Add a small opening book | other | low | 1 | open | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
+| 8 | B005 | Add king-in-centre and pawn-shield king safety | evaluation | high | 1 | rejected | m_20260925_1320_002 | m_20260925_1320_002 | [m_20260925_1320_002](../games/m_20260925_1320_002/) |
 
 ## Details
 
@@ -37,18 +37,6 @@ We spent 2.40 s on 1.e4 and 4.75 s on 2.Nf3 (plies 1 and 3). Pure waste, and a b
 - vs early 2…Qe7 (this game): **3.Bc4 then Nc3/d4** (the plies 5–15 plan).
 
 Play book moves instantly and switch to search as soon as we leave the book. How to check it worked: zero time spent on book plies in the next games, and the average SF eval at move 10 in our favour.
-
-</details>
-
-<details>
-<summary><b>B005</b> — Add king-in-centre and pawn-shield king safety (<i>evaluation, high, ×1, open, from engine-dev</i>)</summary>
-
-**Where:** `engine/src/eval.rs::eval_side` (the king-safety block around the `king_zone` / `KS_UNITS` code) plus castling rights from `Position`.
-**Now:** king safety is only attack units × attacker count on the king zone. Nothing rewards a pawn shield, and nothing punishes a king still on d/e-file that has lost its castling rights or sits on an open file.
-**Change:** (1) MG-only penalty for a king on files c-f with no castling rights left: start at **-40 cp**, plus **-20 cp** per open or half-open file among the king file and its neighbours. (2) Pawn shield: **+12 cp** per own pawn on the 2nd rank and **+6 cp** per pawn on the 3rd rank in front of a castled king (files ±1). (3) Small bonus **+15 cp** MG for keeping any castling right while the king is still on e1/e8.
-**Why:** at plies 5-17 we were consistently 0.4-1.4 pawns below SF (+0.70/+1.14, +1.34/+2.07, +1.32/+2.36, +1.37/+2.64, +2.43/+3.87). At ply 11 we skipped `6.Ng5!` (SF +3.36 vs d4 +2.51). Our own probe after 6.Ng5 gives only +1.68 for the line Bb7 Nxf7 Rg8 Ng5, where Black permanently loses castling. Against stronger Stockfish levels these are exactly the attacking chances we need to take, because a draw is worth nothing.
-**Verify:** FEN `rnb1kb1r/2ppqppp/p4n2/1p2p3/4P3/1BN2N2/PPPP1PPP/R1BQK2R w KQkq - 2 6` → expect `f3g5` (Ng5) within 4 s movetime (currently d4 at d25, 13M nodes). Then SPRT `fastchess ... -each tc=10+0.1 -rounds 5000 -repeat -concurrency 8 -openings file=books/UHO_Lichess_4852_v1.epd format=epd order=random -sprt elo0=0 elo1=5 alpha=0.05 beta=0.05`.
-**Expected:** +15-35 Elo.
 
 </details>
 
@@ -117,5 +105,21 @@ Test FEN `rnb1kb1r/2ppqppp/p4n2/1p2p3/4P3/1BN2N2/PPPP1PPP/R1BQK2R w KQkq - 2 6`,
 **Why:** plies 1-3 took 2.40 s and 4.75 s just to find e4/Nf3. A book saves that time and, more importantly, lets us **pick sharp, unbalanced openings**. A draw is worth nothing, so we want positions where limited Stockfish goes wrong early, as with 2...Qe7/3...a6/4...b5 here. Rotating a few book lines also stops higher-Elo Stockfish from steering every game into the same drawish structure.
 **Verify:** `position startpos` → `go movetime 5000` returns a book move in under 50 ms. Then a head-to-head at 5 s/move vs Stockfish UCI_Elo 1800 with and without the book (the ladder-loop quick match), plus SPRT elo0=0 elo1=5.
 **Expected:** +0-10 Elo from time alone; the main value is choosing winning-chance openings for the ladder.
+
+</details>
+
+<details>
+<summary><b>B005</b> — Add king-in-centre and pawn-shield king safety (<i>evaluation, high, ×1, rejected, from engine-dev</i>)</summary>
+
+**Where:** `engine/src/eval.rs::eval_side` (the king-safety block around the `king_zone` / `KS_UNITS` code) plus castling rights from `Position`.
+**Now:** king safety is only attack units × attacker count on the king zone. Nothing rewards a pawn shield, and nothing punishes a king still on d/e-file that has lost its castling rights or sits on an open file.
+**Change:** (1) MG-only penalty for a king on files c-f with no castling rights left: start at **-40 cp**, plus **-20 cp** per open or half-open file among the king file and its neighbours. (2) Pawn shield: **+12 cp** per own pawn on the 2nd rank and **+6 cp** per pawn on the 3rd rank in front of a castled king (files ±1). (3) Small bonus **+15 cp** MG for keeping any castling right while the king is still on e1/e8.
+**Why:** at plies 5-17 we were consistently 0.4-1.4 pawns below SF (+0.70/+1.14, +1.34/+2.07, +1.32/+2.36, +1.37/+2.64, +2.43/+3.87). At ply 11 we skipped `6.Ng5!` (SF +3.36 vs d4 +2.51). Our own probe after 6.Ng5 gives only +1.68 for the line Bb7 Nxf7 Rg8 Ng5, where Black permanently loses castling. Against stronger Stockfish levels these are exactly the attacking chances we need to take, because a draw is worth nothing.
+**Verify:** FEN `rnb1kb1r/2ppqppp/p4n2/1p2p3/4P3/1BN2N2/PPPP1PPP/R1BQK2R w KQkq - 2 6` → expect `f3g5` (Ng5) within 4 s movetime (currently d4 at d25, 13M nodes). Then SPRT `fastchess ... -each tc=10+0.1 -rounds 5000 -repeat -concurrency 8 -openings file=books/UHO_Lichess_4852_v1.epd format=epd order=random -sprt elo0=0 elo1=5 alpha=0.05 beta=0.05`.
+**Expected:** +15-35 Elo.
+
+**Notes:**
+
+- 2026-09-26T08:01:55Z rejected: h2h -43 ± 25 Elo (511 g @100ms, SPRT [0,10] reject), reverted
 
 </details>

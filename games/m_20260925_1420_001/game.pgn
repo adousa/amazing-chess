@@ -1,0 +1,44 @@
+[Event "Amazing Chess vs Stockfish"]
+[Site "local"]
+[Date "2026.09.25"]
+[Round "-"]
+[White "AmazingChess 0.1.0"]
+[Black "Stockfish 19 (Elo 1420)"]
+[Result "1-0"]
+[StockfishElo "1420"]
+[BlackElo "1420"]
+[EngineColor "white"]
+[EngineVersion "0.1.0"]
+[StockfishVersion "Stockfish 19"]
+[StockfishSettings "UCI_LimitStrength=true UCI_Elo=1420 Threads=1 Hash=64"]
+[TimeControl "5s/move"]
+[MoveTime "5000"]
+[Termination "checkmate"]
+[MatchId "m_20260925_1420_001"]
+[UTCDate "2026.09.25"]
+[UTCTime "10:16:26"]
+
+1. e4 { [%emt 0:00:02.46] } 1... Nc6 { [%emt 0:00:04.90] } 2. d4
+{ [%emt 0:00:03.84] } 2... e5 { [%emt 0:00:04.90] } 3. d5 { [%emt 0:00:03.40] }
+3... Nce7 { [%emt 0:00:04.90] } 4. Nc3 { [%emt 0:00:04.23] } 4... a6
+{ [%emt 0:00:04.90] } 5. Be3 { [%emt 0:00:03.35] } 5... d6
+{ [%emt 0:00:04.90] } 6. Nf3 { [%emt 0:00:02.57] } 6... Nf6
+{ [%emt 0:00:04.90] } 7. h3 { [%emt 0:00:02.96] } 7... g6 { [%emt 0:00:04.90] }
+8. Bd3 { [%emt 0:00:04.75] } 8... Nh5 { [%emt 0:00:04.90] } 9. Qd2
+{ [%emt 0:00:02.37] } 9... Rb8 { [%emt 0:00:04.90] } 10. O-O-O
+{ [%emt 0:00:03.02] } 10... Bg7 { [%emt 0:00:04.90] } 11. Rhe1
+{ [%emt 0:00:03.59] } 11... b5 { [%emt 0:00:04.90] } 12. Kb1
+{ [%emt 0:00:03.93] } 12... Bd7 { [%emt 0:00:04.90] } 13. g4
+{ [%emt 0:00:03.26] } 13... Nf6 { [%emt 0:00:04.90] } 14. Bh6
+{ [%emt 0:00:02.48] } 14... Bxh6 { [%emt 0:00:04.90] } 15. Qxh6
+{ [%emt 0:00:03.18] } 15... Neg8 { [%emt 0:00:04.90] } 16. Qg7
+{ [%emt 0:00:02.45] } 16... Bxg4 { [%emt 0:00:04.90] } 17. hxg4
+{ [%emt 0:00:02.54] } 17... Qd7 { [%emt 0:00:04.90] } 18. g5
+{ [%emt 0:00:03.14] } 18... Nh5 { [%emt 0:00:04.90] } 19. Qxh8
+{ [%emt 0:00:03.67] } 19... Qg4 { [%emt 0:00:04.90] } 20. Qxg8+
+{ [%emt 0:00:02.72] } 20... Ke7 { [%emt 0:00:04.90] } 21. Qxb8
+{ [%emt 0:00:02.81] } 21... c5 { [%emt 0:00:04.90] } 22. dxc6
+{ [%emt 0:00:02.93] } 22... Nf4 { [%emt 0:00:04.90] } 23. Bxb5
+{ [%emt 0:00:00.01] } 23... d5 { [%emt 0:00:04.90] } 24. Nxd5+
+{ [%emt 0:00:00.01] } 24... Ke6 { [%emt 0:00:01.89] } 25. Qxe5#
+{ [%emt 0:00:00.00] } 1-0

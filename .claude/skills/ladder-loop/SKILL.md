@@ -25,7 +25,10 @@ Arguments `$ARGUMENTS`: `--games N` (default 6, alternate colours), `--elo X` (o
 - **Games are evidence** — never edit/delete anything in `games/`. Test games from verification go to
   `/tmp`, never `games/`.
 - **≤ 5 s per move** for both sides; the backend enforces it — don't change time settings to win.
-- **A draw is not a win.** A level is beaten only by an actual `win` saved in `games/`.
+- **Never run engine tests (h2h/SPRT) while ladder games are playing** — CPU contention causes
+  time forfeits that are not real results (docs/decisions/0004). Run ladder games off a frozen copy:
+  `AC_ENGINE_PATH=$PWD/engine/target/versions/amazing-chess-<V>`, so a rebuild can't race them.
+- **A draw is not a win.** Opponent time-forfeits under load are not proof either (ADR 0004). A level is beaten only by an actual `win` saved in `games/`.
 - **Never use Stockfish (or any existing engine/net) as our player.** Stockfish is only opponent/analyser.
 - **Test before you climb:** no engine change is kept without a measured improvement.
 - Keep `CLAUDE.md` current: behaviour/capability changes → update it + its Changelog in the same change.
@@ -44,8 +47,14 @@ If the backend CLI differs, check `.venv/bin/python -m amazing --help` (or read 
 ```bash
 .venv/bin/python -m amazing play --elo <X> --count <N>      # alternate colours; check --help for flags
 ```
-Every game is saved (`games/<id>/`) and the backend then runs the engine analysis and launches
-`/analyze-game <id> --agents-only` headless. Wait for it:
+Every game is saved (`games/<id>/`) and the backend then runs the engine analysis (free, no tokens).
+
+> **Agents are currently OFF** (`AC_AGENTS=0`, the backend default, to save tokens). Unless the
+> environment sets `AC_AGENTS=1`, **skip the wait and the backlog refresh below**: the reports stay
+> `pending`. Work from the existing backlog and the engine analysis (`analysis.json` per-ply evals,
+> mistakes/blunders) instead. To backfill a game later: `.venv/bin/python -m amazing analyze <id> --with-agents`.
+
+With `AC_AGENTS=1` the backend also launches `/analyze-game <id> --agents-only` headless. Wait for it:
 ```bash
 for id in <new ids>; do .venv/bin/python .claude/skills/analyze-game/scripts/briefing.py status $id; done
 ```

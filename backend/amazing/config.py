@@ -45,15 +45,16 @@ class Settings:
     analysis_depth: int = 18
     analysis_threads: int = 1
     analysis_hash_mb: int = 128
-    agents: bool = True
+    agents: bool = False
     agents_parallel: int = 1
     agents_timeout_s: int = 1800
     claude_command: List[str] = field(default_factory=lambda: ["claude"])
 
     @property
     def go_movetime_ms(self) -> int:
-        """`go movetime` sent to both sides: the limit minus a 100 ms safety margin."""
-        return max(self.move_time_ms - 100, 50)
+        """`go movetime` sent to both sides: the limit minus a 250 ms safety margin
+        (100 ms proved too tight under CPU load: see docs/decisions/0004)."""
+        return max(self.move_time_ms - 250, 50)
 
 
 def load_settings() -> Settings:
@@ -107,7 +108,7 @@ def load_settings() -> Settings:
         analysis_depth=_env_int("AC_ANALYSIS_DEPTH", 18),
         analysis_threads=_env_int("AC_ANALYSIS_THREADS", 1),
         analysis_hash_mb=_env_int("AC_ANALYSIS_HASH_MB", 128),
-        agents=_env_int("AC_AGENTS", 1) == 1,
+        agents=_env_int("AC_AGENTS", 0) == 1,  # off by default for now (token cost); AC_AGENTS=1 to enable
         agents_parallel=max(1, _env_int("AC_AGENTS_PARALLEL", 1)),
         agents_timeout_s=_env_int("AC_AGENTS_TIMEOUT_S", 1800),
         claude_command=claude_command,
