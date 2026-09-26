@@ -1,4 +1,4 @@
-# 0004 · 250 ms movetime margin; opponent time-forfeits are not proof
+# 0005 · 250 ms movetime margin; opponent time-forfeits are not proof
 
 **Status:** Accepted · 2026-09-26
 

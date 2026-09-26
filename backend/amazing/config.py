@@ -53,7 +53,7 @@ class Settings:
     @property
     def go_movetime_ms(self) -> int:
         """`go movetime` sent to both sides: the limit minus a 250 ms safety margin
-        (100 ms proved too tight under CPU load: see docs/decisions/0004)."""
+        (100 ms proved too tight under CPU load: see docs/decisions/0005)."""
         return max(self.move_time_ms - 250, 50)
 
 

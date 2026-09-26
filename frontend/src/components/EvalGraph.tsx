@@ -30,23 +30,22 @@ export function EvalGraph({
   const pts = [`0,${y(0)}`, ...sorted.map((a) => `${x(a.ply)},${y(val(a))}`)].join(' ');
   return (
     <svg
-      width={W}
-      height={H}
+      viewBox={`0 0 ${W} ${H}`}
       className="evalgraph"
       onClick={(e) => {
         const r = e.currentTarget.getBoundingClientRect();
         onJump(Math.round(((e.clientX - r.left) / r.width) * total));
       }}
     >
-      <rect width={W} height={H / 2} fill="#eee" />
-      <rect y={H / 2} width={W} height={H / 2} fill="#555" />
-      <polyline points={pts} fill="none" stroke="#2a7" strokeWidth={2} />
+      <rect width={W} height={H / 2} fill="#d6d6d6" />
+      <rect y={H / 2} width={W} height={H / 2} fill="#1b1b1b" />
+      <polyline points={pts} fill="none" stroke="#7d7d7d" strokeWidth={2} />
       {sorted
         .filter((a) => a.classification === 'blunder' || a.classification === 'mistake')
         .map((a) => (
-          <circle key={a.ply} cx={x(a.ply)} cy={y(val(a))} r={3} fill={a.classification === 'blunder' ? 'red' : 'orange'} />
+          <circle key={a.ply} cx={x(a.ply)} cy={y(val(a))} r={a.classification === 'blunder' ? 3.5 : 2.5} fill="#000" stroke="#fff" strokeWidth={1} />
         ))}
-      <line x1={x(ply)} x2={x(ply)} y1={0} y2={H} stroke="#36c" />
+      <line x1={x(ply)} x2={x(ply)} y1={0} y2={H} stroke="#999" strokeDasharray="3 2" />
     </svg>
   );
 }

@@ -1,0 +1,15 @@
+{
+  "matchId": "m_20260926_3190_017",
+  "status": "running",
+  "reports": {
+    "gmCoach": {
+      "agent": "gm-coach",
+      "status": "pending"
+    },
+    "engineDev": {
+      "agent": "engine-dev",
+      "status": "pending"
+    }
+  },
+  "createdAt": "2026-09-26T09:43:50Z"
+}

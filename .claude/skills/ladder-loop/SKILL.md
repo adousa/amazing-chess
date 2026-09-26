@@ -26,9 +26,9 @@ Arguments `$ARGUMENTS`: `--games N` (default 6, alternate colours), `--elo X` (o
   `/tmp`, never `games/`.
 - **≤ 5 s per move** for both sides; the backend enforces it — don't change time settings to win.
 - **Never run engine tests (h2h/SPRT) while ladder games are playing** — CPU contention causes
-  time forfeits that are not real results (docs/decisions/0004). Run ladder games off a frozen copy:
+  time forfeits that are not real results (docs/decisions/0005). Run ladder games off a frozen copy:
   `AC_ENGINE_PATH=$PWD/engine/target/versions/amazing-chess-<V>`, so a rebuild can't race them.
-- **A draw is not a win.** Opponent time-forfeits under load are not proof either (ADR 0004). A level is beaten only by an actual `win` saved in `games/`.
+- **A draw is not a win.** Opponent time-forfeits under load are not proof either (ADR 0005). A level is beaten only by an actual `win` saved in `games/`.
 - **Never use Stockfish (or any existing engine/net) as our player.** Stockfish is only opponent/analyser.
 - **Test before you climb:** no engine change is kept without a measured improvement.
 - Keep `CLAUDE.md` current: behaviour/capability changes → update it + its Changelog in the same change.

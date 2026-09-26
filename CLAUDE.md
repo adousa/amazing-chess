@@ -54,7 +54,7 @@ Background, rules and strategy: [docs/00-overview.md](docs/00-overview.md).
 ### 2. Decide and record the outcome
 - Outcome is recorded **from our engine's point of view**: `win`, `draw` or `loss`.
 - **A draw is not a win.** A Stockfish Elo level only counts as beaten after an actual win on the
-  board. A time forfeit caused by our own test setup doesn't count (see `docs/decisions/0004`).
+  board. A time forfeit caused by our own test setup doesn't count (see `docs/decisions/0005`).
 - Once a level is beaten, the next attempt can use a higher Elo.
 
 ### 3. Save every game (evidence)
@@ -69,6 +69,15 @@ Background, rules and strategy: [docs/00-overview.md](docs/00-overview.md).
 - Any saved game can be replayed **from the first move to the last** on a graphical chessboard.
 - The viewer can step forward/back, jump to start/end, jump to any move and autoplay.
 - The replay shows the move list, the players (incl. Stockfish Elo) and the result.
+- The board is staged as an homage to *The Seventh Seal*: a black-and-white, overcast, empty stony
+  beach by the sea with only the two players and the board. Our engine is **the Knight** and
+  Stockfish is **Death**. The default view is from the Knight's side, with Death and the board
+  clearly in front of him.
+- **The two players play the moves:** when a game steps forward (replay, autoplay or live) the moving
+  player reaches out, picks up the piece and sets it down. Captured pieces are placed beside the
+  board, and castling, en passant and promotion are played out.
+- Each move is also given as a subtitle in words (e.g. "Death takes the pawn on e4 with the knight").
+- A plain 2D board is always available as an alternative view, and is used when 3D is not supported.
 
 ### 5. Analyse every game
 - After **each** game an **analysis skill** runs automatically on it.
@@ -178,8 +187,9 @@ How to work in parallel: [docs/08-parallel-work.md](docs/08-parallel-work.md).
   1 thread: 1 W / 0 D / 5 L (6 games; the restart interrupted 4). 3 threads: 0 W / 1 D / 5 L after 6 of 10
   (still running). The losses are decided in the middlegame (plies 36–62). A stronger evaluation (own NNUE) is the next step.
 - Phase: **1 — qualify end-to-end**, first proof game won, saved, analysed and reviewed by both agents
-  (see [roadmap](docs/03-roadmap.md)). Engine v0.2.0 (classical alpha-beta + correction history), backend, analysis
-  skill + both agents, and a *temporary* simple frontend exist. The frontend design/rewrite is next.
+  (see [roadmap](docs/03-roadmap.md)). Engine v0.2.0 (classical alpha-beta + correction history), backend,
+  analysis skill + both agents exist. The frontend now has the *Seventh Seal* replay/live stage; the ladder
+  and stats pages are restyled but not yet redesigned.
 - ⏸️ Automatic agent reviews are **paused** (engine analysis still runs). Re-enable before submission.
 
 ---
@@ -189,6 +199,10 @@ How to work in parallel: [docs/08-parallel-work.md](docs/08-parallel-work.md).
 - 2026-09-25 — Paused the automatic GM-coach / engine-dev reviews to save tokens. Engine analysis
   still runs after every game, and new games keep their agent reports `pending` so they can be
   backfilled later.
+- 2026-09-25 — Frontend: *Seventh Seal* stage for replay/live. Black-and-white 3D beach, the Knight
+  (our engine) vs Death (Stockfish), and both players physically play each move. Also move
+  subtitles, title/ending cards, Shoulder/Above/2D views, and a period black-and-white style across
+  the app. No contract change. See [ADR 0004](docs/decisions/0004-seventh-seal-3d-stage.md).
 <!-- Newest first. One line per change: date — what changed (PR/commit). -->
 - 2026-09-26 — Our engine may use several search threads (organisers); the 3190 measurement runs with
   3 threads and 3 games in parallel, a load that keeps the laptop responsive.
@@ -198,7 +212,7 @@ How to work in parallel: [docs/08-parallel-work.md](docs/08-parallel-work.md).
   800 games @100 ms). King-safety shelter term (B005) rejected: −43 ± 25 Elo, reverted.
 - 2026-09-26 — Stockfish Elo 2600 beaten 4/4 by checkmate, engine v0.1.0 (proof `m_20260926_2600_001`).
 - 2026-09-26 — Movetime safety margin 100 → 250 ms for both sides. The 4 time-forfeit wins at 2600
-  are artifacts of CPU contention and are not claimed (ADR 0004). A level counts only after an on-board win.
+  are artifacts of CPU contention and are not claimed (ADR 0005). A level counts only after an on-board win.
 - 2026-09-25 — Stockfish Elo 2300 beaten 4/4 by engine v0.1.0 (proof `m_20260925_2300_003`).
 - 2026-09-25 — Stockfish Elo 2000 beaten 4/4 by engine v0.1.0 (proof `m_20260925_2000_003`).
 - 2026-09-25 — Stockfish Elo 1700 beaten 4/4 by engine v0.1.0 (proof `m_20260925_1700_001`).

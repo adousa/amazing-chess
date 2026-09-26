@@ -21,7 +21,7 @@ export function App() {
   return (
     <>
       <header>
-        <b>Amazing Chess</b>
+        <a href="#/matches" className="brand">Amazing Chess</a>
         {nav('/matches', 'Matches')}
         {nav('/ladder', 'Ladder')}
         {nav('/stats', 'Stats')}
