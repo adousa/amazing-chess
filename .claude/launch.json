@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "backend",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "AC_ENGINE_OPTIONS='{\"Threads\":3,\"Hash\":128,\"Contempt\":60}' exec .venv/bin/python -m amazing serve --port 8000"],
+      "port": 8000
+    },
+    {
+      "name": "frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "frontend", "run", "dev"],
+      "port": 5173
+    }
+  ]
+}
